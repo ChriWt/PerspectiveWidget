@@ -1,5 +1,5 @@
 from cube import Cube
-from cubeVisualizer import CubeVisualizer
+from PerspectiveWidget import CubeVisualizer
 from vector3 import Vector3
 
 from customtkinter import CTk

@@ -307,14 +307,14 @@ class CubeVisualizer(CTkFrame):
         
         new_vertices = self.__calculate_vertices()
 
-        for start, end in self._cube.calculate_edges(new_vertices):
+        for start, end in self._cube.get_edges(new_vertices):
             self._canvas.create_line(start.x, start.y, end.x, end.y, fill=self._cube.color, width=self._cube.stroke_width)
 
         self.__display_focal_point()
         
     def __calculate_vertices(self) -> list:
         new_vertices = []
-        for vertex in self._cube.vertices:
+        for vertex in self._cube.get_vertices():
             new_vertices.append(self.__apply_projection(vertex))
         return new_vertices
 

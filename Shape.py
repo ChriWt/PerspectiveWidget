@@ -9,7 +9,7 @@ class Shape(ABC):
         pass
 
     @abstractmethod
-    def get_edges(self) -> list:
+    def get_edges(self, vertex: Vector3) -> list:
         pass
 
     @abstractmethod

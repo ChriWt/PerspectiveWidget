@@ -1,7 +1,8 @@
+from Shape import Shape
 from vector3 import Vector3
 
 
-class Cube:
+class Cube(Shape):
 
     EDGES = [
             (0, 1), (1, 2), (2, 3), (3, 0),  # Spigoli superiore
@@ -40,7 +41,7 @@ class Cube:
             self.far_back_right,
         ]
     
-    def calculate_edges(self, vertex: Vector3) -> list:
+    def get_edges(self, vertex: Vector3) -> list:
         return [(vertex[start], vertex[end]) for start, end in Cube.EDGES]
     
     def get_origin(self) -> Vector3:
@@ -49,6 +50,9 @@ class Cube:
             (self.near_front_left.y + self.far_back_right.y) / 2, 
             (self.near_front_left.z + self.far_back_right.z) / 2)
     
+    def get_vertices(self) -> list:
+        return self.vertices
+
     def update_near_front_left(self, vector: Vector3) -> None:
         self.near_front_left = vector
         self.width = self.far_back_right.x - self.near_front_left.x
