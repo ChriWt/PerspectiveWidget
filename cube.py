@@ -1,8 +1,7 @@
-from Shape import Shape
 from vector3 import Vector3
 
 
-class Cube(Shape):
+class Cube:
 
     EDGES = [
             (0, 1), (1, 2), (2, 3), (3, 0),  # Spigoli superiore
