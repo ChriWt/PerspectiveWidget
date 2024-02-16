@@ -1,9 +1,13 @@
 from random import randint
 from customtkinter import CTkFrame, CTkCanvas, IntVar, DoubleVar, CTkSlider, CTkLabel, CTkButton
 from numpy import tan, array, radians, sin, cos
+from src.rendering.cubeRendering import CubeRendering
+from src.rendering.projectionMatrix import ProjectionMatrix
+from src.rendering.sphereRendering import SphereRendering
+from src.shape.shape import Shape
 
-from cube import Cube
-from vector3 import Vector3
+from src.shape.cube import Cube
+from src.vector3 import Vector3
 
     
 class CubeVisualizer(CTkFrame):
@@ -23,9 +27,9 @@ class CubeVisualizer(CTkFrame):
     INITIAL_ROTATION_X = 0
     INITIAL_ROTATION_Y = 0
     INITIAL_ROTATION_Z = 0
-    INITIAL_TRANSLATION_X = 120
-    INITIAL_TRANSLATION_Y = 130
-    INITIAL_TRANSLATION_Z = 70
+    INITIAL_TRANSLATION_X = 200
+    INITIAL_TRANSLATION_Y = 200
+    INITIAL_TRANSLATION_Z = 200
 
     # Cube Dimension Constants
     INITIAL_CUBE_WIDTH = 1
@@ -39,9 +43,10 @@ class CubeVisualizer(CTkFrame):
     OFFSET_Y_SLIDER_RANGE = (0, 1080)
     ASPECT_RATIO_SLIDER_RANGE = (0.1, 3)
     ROTATION_SLIDER_RANGE = (0, 360)  # degrees for X, Y, Z
-    TRANSLATION_SLIDER_RANGE = (-1000, 1000)  # for X and Y, Z is (0, 1000)
-    TRANSLATION_Z_SLIDER_RANGE = (0, 1000)
+    TRANSLATION_SLIDER_RANGE = (-1500, 1500)  # for X and Y, Z is (0, 1000)
+    TRANSLATION_Z_SLIDER_RANGE = (0, 5000)
     CUBE_DIMENSION_SLIDER_RANGE = (1, 500)  # for width, height, depth
+    SHAPE_VERTICES_SLIDER_RANGE = (4, 30)
 
     # Mouse Interaction Constants
     TRANSLATION_Z_INCREMENT = 10  # value for translation Z on mouse wheel event
@@ -73,8 +78,10 @@ class CubeVisualizer(CTkFrame):
         self._show_rotation_options = show_rotation_options
         self._show_translation_options = show_translation_options
         self._show_cube_options = show_cube_options
+        self._projection_matrix = None
 
         self.__init_variables()
+        self.__init_projection_matrix()
         self.__init_UI()
         self.__init_variable_trace()
         self.__bind_size_change()
@@ -85,10 +92,9 @@ class CubeVisualizer(CTkFrame):
         self._scale = DoubleVar(value=self.INITIAL_SCALE)
         self._offset_x = IntVar(value=self._width / 2)
         self._offset_y = IntVar(value=self._height / 2)
-        self._aspect_ratio = DoubleVar(value=self._width / self._height)
+        self._aspect_ratio = DoubleVar(value=1)
         self._distance_far_plane = self.DISTANCE_FAR_PLANE
         self._distance_near_plane = self.DISTANCE_NEAR_PLANE
-        self._projection_matrix = self.__create_projection_matrix()
         self._rotation_x = IntVar(value=self.INITIAL_ROTATION_X)
         self._rotation_y = IntVar(value=self.INITIAL_ROTATION_Y)
         self._rotation_z = IntVar(value=self.INITIAL_ROTATION_Z)
@@ -98,6 +104,10 @@ class CubeVisualizer(CTkFrame):
         self._cube_width = IntVar(value=self.INITIAL_CUBE_WIDTH)
         self._cube_height = IntVar(value=self.INITIAL_CUBE_HEIGHT)
         self._cube_depth = IntVar(value=self.INITIAL_CUBE_DEPTH)
+        self._shape_vertices = IntVar(value=0)
+
+    def __init_projection_matrix(self) -> None:
+        self._projection_matrix = ProjectionMatrix(fov=self._fov.get(), aspect_ratio=self._aspect_ratio.get())
 
     def __init_UI(self):
         self._canvas = CTkCanvas(master=self, bg=self.CANVAS_BACKGROUND_COLOR)
@@ -196,11 +206,11 @@ class CubeVisualizer(CTkFrame):
         CTkSlider(master=frame, variable=self._offset_y, from_=self.OFFSET_Y_SLIDER_RANGE[0], to=self.OFFSET_Y_SLIDER_RANGE[1], orientation=self.HORIZONTAL, command=self.__update_labels).pack(side="top")
         frame.pack(side="left" if self._orientation == self.HORIZONTAL else "top")
 
-        frame = CTkFrame(master=self._canvas_options_frame)
-        self._aspect_ratio_label = CTkLabel(master=frame, text=f"Aspect Ratio ({round(self._aspect_ratio.get())})")
-        self._aspect_ratio_label.pack(side="top")
-        CTkSlider(master=frame, variable=self._aspect_ratio, from_=self.ASPECT_RATIO_SLIDER_RANGE[0], to=self.ASPECT_RATIO_SLIDER_RANGE[1], orientation=self.HORIZONTAL, command=self.__update_labels).pack(side="top")
-        frame.pack(side="left" if self._orientation == self.HORIZONTAL else "top")
+        # frame = CTkFrame(master=self._canvas_options_frame)
+        # self._aspect_ratio_label = CTkLabel(master=frame, text=f"Aspect Ratio ({round(self._aspect_ratio.get())})")
+        # self._aspect_ratio_label.pack(side="top")
+        # CTkSlider(master=frame, variable=self._aspect_ratio, from_=self.ASPECT_RATIO_SLIDER_RANGE[0], to=self.ASPECT_RATIO_SLIDER_RANGE[1], orientation=self.HORIZONTAL, command=self.__update_labels).pack(side="top")
+        # frame.pack(side="left" if self._orientation == self.HORIZONTAL else "top")
 
         frame = CTkFrame(master=self._rotation_options_frame)
         self._rotation_x_label = CTkLabel(master=frame, text=f"Rotation X ({self._rotation_x.get()})")
@@ -256,165 +266,181 @@ class CubeVisualizer(CTkFrame):
         CTkSlider(master=frame, variable=self._cube_depth, from_=self.CUBE_DIMENSION_SLIDER_RANGE[0], to=self.CUBE_DIMENSION_SLIDER_RANGE[1], orientation=self.HORIZONTAL, command=self.__update_labels).pack(side="top")
         frame.pack(side="left" if self._orientation == self.HORIZONTAL else "top")
 
-        CTkButton(master=self._option_frame, text="Random Cube", command=self.__randomize_cube_properties).pack(side="bottom" if self._orientation == self.VERTICAL else "right", padx=10 if self._orientation == self.HORIZONTAL else 0, pady=20 if self._orientation == self.VERTICAL else 10)
+        frame = CTkFrame(master=self._cube_options_frame)
+        self._shape_vertices_label = CTkLabel(master=frame, text=f"Cube Vertices ({self._shape_vertices.get()})")
+        self._shape_vertices_label.pack(side="top")
+        CTkSlider(master=frame, variable=self._shape_vertices, from_=self.SHAPE_VERTICES_SLIDER_RANGE[0], to=self.SHAPE_VERTICES_SLIDER_RANGE[1], orientation=self.HORIZONTAL, command=self.__update_labels).pack(side="top")
+        frame.pack(side="left" if self._orientation == self.HORIZONTAL else "top")
 
-    def __randomize_cube_properties(self):
-        self._rotation_x.set(randint(self.ROTATION_SLIDER_RANGE[0], self.ROTATION_SLIDER_RANGE[1]))
-        self._rotation_y.set(randint(self.ROTATION_SLIDER_RANGE[0], self.ROTATION_SLIDER_RANGE[1]))
-        self._rotation_z.set(randint(self.ROTATION_SLIDER_RANGE[0], self.ROTATION_SLIDER_RANGE[1]))
+        # CTkButton(master=self._option_frame, text="Random Cube", command=self.__randomize_cube_properties).pack(side="bottom" if self._orientation == self.VERTICAL else "right", padx=10 if self._orientation == self.HORIZONTAL else 0, pady=20 if self._orientation == self.VERTICAL else 10)
 
-        self.__update_labels()
-        self.__draw_cube()
+    # def __randomize_cube_properties(self):
+    #     self._rotation_x.set(randint(self.ROTATION_SLIDER_RANGE[0], self.ROTATION_SLIDER_RANGE[1]))
+    #     self._rotation_y.set(randint(self.ROTATION_SLIDER_RANGE[0], self.ROTATION_SLIDER_RANGE[1]))
+    #     self._rotation_z.set(randint(self.ROTATION_SLIDER_RANGE[0], self.ROTATION_SLIDER_RANGE[1]))
+
+    #     self.__update_labels()
+    #     self.__draw_cube()
 
     def __init_variable_trace(self):
         self._fov.trace_add("write", self.__update_projection_matrix)
-        self._scale.trace_add("write", self.__update_projection_matrix)
-        self._offset_x.trace_add("write", self.__update_projection_matrix)
-        self._offset_y.trace_add("write", self.__update_projection_matrix)
+        # self._scale.trace_add("write", self.__update_projection_matrix)
+        # self._offset_x.trace_add("write", self.__update_projection_matrix)
+        # self._offset_y.trace_add("write", self.__update_projection_matrix)
         self._aspect_ratio.trace_add("write", self.__update_projection_matrix)
-        self._rotation_x.trace_add("write", lambda *args: self.__draw_cube())
-        self._rotation_y.trace_add("write", lambda *args: self.__draw_cube())
-        self._rotation_z.trace_add("write", lambda *args: self.__draw_cube())
-        self._translation_x.trace_add("write", lambda *args: self.__draw_cube())
-        self._translation_y.trace_add("write", lambda *args: self.__draw_cube())
-        self._translation_z.trace_add("write", lambda *args: self.__draw_cube())
-        self._cube_width.trace_add("write", lambda *args: self.__update_cube_size())
-        self._cube_height.trace_add("write", lambda *args: self.__update_cube_size())
-        self._cube_depth.trace_add("write", lambda *args: self.__update_cube_size())
-    
-    def __create_projection_matrix(self):
-        scale_x = (1 / tan(radians(self._fov.get() / 2))) / self._aspect_ratio.get()
-        scale_y = 1 / tan(radians(self._fov.get() / 2))
-        scale_z = ((self._distance_far_plane + self._distance_near_plane) * -1) / (self._distance_far_plane - self._distance_near_plane)
-        translate_z = (-2 * self._distance_far_plane * self._distance_near_plane) / (self._distance_far_plane - self._distance_near_plane)
-    
-        return [
-            [scale_x, 0, 0, 0],
-            [0, scale_y, 0, 0],
-            [0, 0, scale_z, translate_z],
-            [0, 0, -1, 0]
-        ]
+        self._rotation_x.trace_add("write", self.__update_shape_rotation)
+        self._rotation_y.trace_add("write", self.__update_shape_rotation)
+        self._rotation_z.trace_add("write", self.__update_shape_rotation)
+        self._translation_x.trace_add("write", self.__update_shape_position)
+        self._translation_y.trace_add("write", self.__update_shape_position)
+        self._translation_z.trace_add("write", self.__update_shape_position)
+        self._cube_width.trace_add("write", self.__update_shape_size)
+        self._cube_height.trace_add("write", self.__update_shape_size)
+        self._cube_depth.trace_add("write", self.__update_shape_size)
+        self._shape_vertices.trace_add("write", self.__update_shape_vertices)
 
-    def __update_projection_matrix(self, *args):
-        self._projection_matrix = self.__create_projection_matrix()
-        self.__draw_cube()
-
-    def __draw_cube(self) -> None:
-        if self._cube is None: 
-            return
+    def __update_projection_matrix(self, *_) -> None:
+        self._projection_matrix.update(
+            fov=self._fov.get(), 
+            aspect_ratio=self._aspect_ratio.get())
+        self.__render(self._shape)
         
-        self._canvas.delete("all")
+    def __update_shape_position(self, *_) -> None:
+        self._shape._velocity = Vector3(self._translation_x.get(), self._translation_y.get(), self._translation_z.get())
+        self.__render(self._shape)
+
+    def __update_shape_size(self, *_) -> None:
+        self._shape._width = self._cube_width.get()
+        self._shape._height = self._cube_height.get()
+        self._shape._depth = self._cube_depth.get()
+        self.__render(self._shape)
+
+    def __update_shape_vertices(self, *_) -> None:
+        self._shape._vertices_count = self._shape_vertices.get()
+        self.__render(self._shape)
+
+    def __update_shape_rotation(self, *_) -> None:
+        self._shape._rotation_x = self._rotation_x.get()
+        self._shape._rotation_y = self._rotation_y.get()
+        self._shape._rotation_z = self._rotation_z.get()
+        self.__render(self._shape)
+
+    # def __draw_cube(self) -> None:
+    #     if self._cube is None: 
+    #         return
         
-        new_vertices = self.__calculate_vertices()
-
-        for start, end in self._cube.get_edges(new_vertices):
-            self._canvas.create_line(start.x, start.y, end.x, end.y, fill=self._cube.color, width=self._cube.stroke_width)
-
-        self.__display_focal_point()
+    #     self._canvas.delete("all")
         
-    def __calculate_vertices(self) -> list:
-        new_vertices = []
-        for vertex in self._cube.get_vertices():
-            new_vertices.append(self.__apply_projection(vertex))
-        return new_vertices
+    #     new_vertices = self.__calculate_vertices()
 
-    def __apply_projection(self, vertex: Vector3) -> None:
-        centered_vertex = vertex - self._cube.get_origin()
+    #     for start, end in self._cube.get_edges(new_vertices):
+    #         self._canvas.create_line(start.x, start.y, end.x, end.y, fill=self._cube.color, width=self._cube.stroke_width)
 
-        vertex_4d = array([centered_vertex.x, centered_vertex.y, centered_vertex.z, 1])
+    #     self.__display_focal_point()
+        
+    # def __calculate_vertices(self) -> list:
+    #     new_vertices = []
+    #     for vertex in self._cube.get_vertices():
+    #         new_vertices.append(self.__apply_projection(vertex))
+    #     return new_vertices
 
-        rotated_vertex_4d = self.__apply_rotation(vertex_4d)
+    # def __apply_projection(self, vertex: Vector3) -> None:
+    #     centered_vertex = vertex - self._cube.get_origin()
 
-        translated_vertex_4d = self.__translate_vertex(rotated_vertex_4d)
+    #     vertex_4d = array([centered_vertex.x, centered_vertex.y, centered_vertex.z, 1])
 
-        projected_vertex = self._projection_matrix @ translated_vertex_4d
+    #     rotated_vertex_4d = self.__apply_rotation(vertex_4d)
+
+    #     translated_vertex_4d = self.__translate_vertex(rotated_vertex_4d)
+
+    #     projected_vertex = self._projection_matrix @ translated_vertex_4d
     
-        projected_vertex = self.__normalize_projected_vertex(projected_vertex)
+    #     projected_vertex = self.__normalize_projected_vertex(projected_vertex)
 
-        x = projected_vertex[0] * self._scale.get() + self._offset_x.get()
-        y = projected_vertex[1] * self._scale.get() + self._offset_y.get()
+    #     x = projected_vertex[0] * self._scale.get() + self._offset_x.get()
+    #     y = projected_vertex[1] * self._scale.get() + self._offset_y.get()
 
-        return Vector3(x, y, projected_vertex[2])
+    #     return Vector3(x, y, projected_vertex[2])
 
-    def __apply_rotation(self, vertex_4d: array) -> array:
-        rotated_vertex_4d = self.__rotation_matrix_y(self._rotation_y.get()) @ \
-                            self.__rotation_matrix_x(self._rotation_x.get()) @ \
-                            self.__rotation_matrix_z(self._rotation_z.get()) @ \
-                            vertex_4d
+    # def __apply_rotation(self, vertex_4d: array) -> array:
+    #     rotated_vertex_4d = self.__rotation_matrix_y(self._rotation_y.get()) @ \
+    #                         self.__rotation_matrix_x(self._rotation_x.get()) @ \
+    #                         self.__rotation_matrix_z(self._rotation_z.get()) @ \
+    #                         vertex_4d
     
-        origin = self._cube.get_origin()
-        return array([
-                rotated_vertex_4d[0] + origin.x,
-                rotated_vertex_4d[1] + origin.y,
-                rotated_vertex_4d[2] + origin.z,
-                1
-            ])
+    #     origin = self._cube.get_origin()
+    #     return array([
+    #             rotated_vertex_4d[0] + origin.x,
+    #             rotated_vertex_4d[1] + origin.y,
+    #             rotated_vertex_4d[2] + origin.z,
+    #             1
+    #         ])
 
-    def __rotation_matrix_x(self, angle: float):
-        angle = radians(angle)
-        return array([
-            [cos(angle), 0, sin(angle), 0],
-            [0, 1, 0, 0],
-            [-sin(angle), 0, cos(angle), 0],
-            [0, 0, 0, 1]
-        ])
+    # def __rotation_matrix_x(self, angle: float):
+    #     angle = radians(angle)
+    #     return array([
+    #         [cos(angle), 0, sin(angle), 0],
+    #         [0, 1, 0, 0],
+    #         [-sin(angle), 0, cos(angle), 0],
+    #         [0, 0, 0, 1]
+    #     ])
 
-    def __rotation_matrix_y(self, angle: float) -> array:
-        angle = radians(angle)
-        return array([
-            [1, 0, 0, 0],
-            [0, cos(angle), -sin(angle), 0],
-            [0, sin(angle), cos(angle), 0],
-            [0, 0, 0, 1]
-        ])
+    # def __rotation_matrix_y(self, angle: float) -> array:
+    #     angle = radians(angle)
+    #     return array([
+    #         [1, 0, 0, 0],
+    #         [0, cos(angle), -sin(angle), 0],
+    #         [0, sin(angle), cos(angle), 0],
+    #         [0, 0, 0, 1]
+    #     ])
 
-    def __rotation_matrix_z(self, angle: float):
-        angle = radians(angle)
-        return array([
-            [cos(angle), -sin(angle), 0, 0],
-            [sin(angle), cos(angle), 0, 0],
-            [0, 0, 1, 0],
-            [0, 0, 0, 1]
-        ])
+    # def __rotation_matrix_z(self, angle: float):
+    #     angle = radians(angle)
+    #     return array([
+    #         [cos(angle), -sin(angle), 0, 0],
+    #         [sin(angle), cos(angle), 0, 0],
+    #         [0, 0, 1, 0],
+    #         [0, 0, 0, 1]
+    #     ])
 
-    def __translate_vertex(self, vertex_4d: array) -> array:
-        return array([
-            vertex_4d[0] + -self._translation_x.get(),
-            vertex_4d[1] + -self._translation_y.get(),
-            vertex_4d[2] + self._translation_z.get(),
-            1
-        ])
+    # def __translate_vertex(self, vertex_4d: array) -> array:
+    #     return array([
+    #         vertex_4d[0] + -self._translation_x.get(),
+    #         vertex_4d[1] + -self._translation_y.get(),
+    #         vertex_4d[2] + self._translation_z.get(),
+    #         1
+    #     ])
 
-    def __update_cube_size(self):
-        half_width = self._cube_width.get() / 2
-        half_height = self._cube_height.get() / 2
-        half_depth = self._cube_depth.get() / 2
-        origin = self._cube.get_origin()
-        self._cube.update_near_front_left(Vector3(origin.x - half_width, origin.y - half_height, origin.z - half_depth))
-        self._cube.update_far_back_right(Vector3(origin.x + half_width, origin.y + half_height, origin.z + half_depth))
-        self.__draw_cube()
+    # def __update_cube_size(self):
+    #     half_width = self._cube_width.get() / 2
+    #     half_height = self._cube_height.get() / 2
+    #     half_depth = self._cube_depth.get() / 2
+    #     origin = self._cube.get_origin()
+    #     self._cube.update_near_front_left(Vector3(origin.x - half_width, origin.y - half_height, origin.z - half_depth))
+    #     self._cube.update_far_back_right(Vector3(origin.x + half_width, origin.y + half_height, origin.z + half_depth))
+    #     self.__draw_cube()
 
-    def __normalize_projected_vertex(self, projected_vertex: array) -> array:
-        vertex_4d = projected_vertex
-        if vertex_4d[3] != 0:
-            vertex_4d /= vertex_4d[3]
-        return vertex_4d
+    # def __normalize_projected_vertex(self, projected_vertex: array) -> array:
+    #     vertex_4d = projected_vertex
+    #     if vertex_4d[3] != 0:
+    #         vertex_4d /= vertex_4d[3]
+    #     return vertex_4d
     
-    def __display_focal_point(self) -> None:
-        self._canvas.create_oval(
-            self._offset_x.get() + self.FOCAL_POINT_SIZE_OFFSETS[0], 
-            self._offset_y.get() + self.FOCAL_POINT_SIZE_OFFSETS[0],
-            self._offset_x.get() + self.FOCAL_POINT_SIZE_OFFSETS[1],
-            self._offset_y.get() + self.FOCAL_POINT_SIZE_OFFSETS[1],
-            fill=self.FOCAL_POINT_COLOR, 
-            outline=self.FOCAL_POINT_COLOR)
+    # def __display_focal_point(self) -> None:
+    #     self._canvas.create_oval(
+    #         self._offset_x.get() + self.FOCAL_POINT_SIZE_OFFSETS[0], 
+    #         self._offset_y.get() + self.FOCAL_POINT_SIZE_OFFSETS[0],
+    #         self._offset_x.get() + self.FOCAL_POINT_SIZE_OFFSETS[1],
+    #         self._offset_y.get() + self.FOCAL_POINT_SIZE_OFFSETS[1],
+    #         fill=self.FOCAL_POINT_COLOR, 
+    #         outline=self.FOCAL_POINT_COLOR)
 
     def __update_labels(self, *args):
         self._fov_label.configure(text=f"Fov ({self._fov.get()})")
         self._scale_label.configure(text=f"Scale ({round(self._scale.get(), 1)})")
         self._offset_x_label.configure(text=f"Offset X ({self._offset_x.get()})")
         self._offset_y_label.configure(text=f"Offset Y ({self._offset_y.get()})")
-        self._aspect_ratio_label.configure(text=f"Aspect Ratio ({round(self._aspect_ratio.get(), 1)})")
+        # self._aspect_ratio_label.configure(text=f"Aspect Ratio ({round(self._aspect_ratio.get(), 1)})")
         self._rotation_x_label.configure(text=f"Rotation X ({self._rotation_x.get()})")
         self._rotation_y_label.configure(text=f"Rotation Y ({self._rotation_y.get()})")
         self._rotation_z_label.configure(text=f"Rotation Z ({self._rotation_z.get()})")
@@ -424,17 +450,19 @@ class CubeVisualizer(CTkFrame):
         self._cube_width_label.configure(text=f"Cube Width ({self._cube_width.get()})")
         self._cube_height_label.configure(text=f"Cube Height ({self._cube_height.get()})")
         self._cube_depth_label.configure(text=f"Cube Depth ({self._cube_depth.get()})")
+        self._shape_vertices_label.configure(text=f"Cube Vertices ({self._shape_vertices.get()})")
         
-    def __bind_size_change(self) -> None:
-        self.bind("<Configure>", self.__on_size_change)
+    def __bind_size_change(self) -> None:        
+        # self.bind("<Configure>", self.__on_size_change)
+        pass
 
-    def __on_size_change(self, event) -> None:
-        if event.width == self._width and event.height == self._height:
-            return
-        self._offset_x.set(event.width / 2)
-        self._offset_y.set(event.height / 2)
-        self.__update_labels()
-        self.__draw_cube()
+    # def __on_size_change(self, event) -> None:
+    #     if event.width == self._width and event.height == self._height:
+    #         return
+    #     self._offset_x.set(event.width / 2)
+    #     self._offset_y.set(event.height / 2)
+    #     self.__update_labels()
+    #     self.__draw_cube()
     
     def pack(self, *args, **kwargs):
         super().pack(*args, **kwargs)
@@ -463,13 +491,31 @@ class CubeVisualizer(CTkFrame):
         if self._show_cube_options:
             self._cube_options_frame.pack(**common_kwargs)
     
-    def add_cube(self, cube: Cube) -> None:
-        self._cube = cube
-        width, height, depth = cube.width, cube.height, cube.depth
+    # def add_cube(self, cube: Cube) -> None:
+    #     self._cube = cube
+    #     width, height, depth = cube.width, cube.height, cube.depth
+
+    #     self._cube_width.set(width)
+    #     self._cube_height.set(height)
+    #     self._cube_depth.set(depth)
+        
+    #     self.__update_labels()
+    #     self.__draw_cube()
+            
+    def add_shape(self, shape: Shape) -> None:
+        self._shape = shape
+        width, height, depth = shape._width, shape._height, shape._depth
 
         self._cube_width.set(width)
         self._cube_height.set(height)
         self._cube_depth.set(depth)
-        
+        self._shape_vertices.set(shape._vertices_count)
         self.__update_labels()
-        self.__draw_cube()
+
+        self._renderer = SphereRendering(self._canvas, self._projection_matrix)
+        self._renderer.render(shape)
+
+    def __render(self, shape: Shape) -> None:
+        self._canvas.delete("all")
+        self._shape = shape
+        self._renderer.render(shape)
