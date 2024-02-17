@@ -1,6 +1,6 @@
 from src.shape.shape import Shape
 from src.vector3 import Vector3
-from typing import List, Optional, Tuple
+from typing import List, Optional
 from numpy import sin, cos
 from math import pi
 import numpy as np
@@ -32,11 +32,11 @@ class Sphere(Shape):
                 y = self._origin.y + self._height * sin(phi * pi / self._vertices_count) * sin(theta * 2 * pi / self._vertices_count)
                 z = self._origin.z + self._depth * cos(phi * pi / self._vertices_count)
                 vertices.append(Vector3(x, y, z))
+
+        vertices.append(Vector3(self._origin.x, self._origin.y, self._origin.z - self._depth))
         return vertices
 
-
     def get_edges(self) -> np.ndarray:
-        # Assuming vertices are laid out in a grid
         phi_indices = np.arange(self._vertices_count * self._vertices_count).reshape(self._vertices_count, self._vertices_count)
         
         # Horizontal edges (latitude lines), avoiding wrapping at the end of a row
@@ -49,13 +49,10 @@ class Sphere(Shape):
         last_to_first_edges = np.stack((phi_indices[:, -1], phi_indices[:, 0]), axis=1)
 
         # Connect the last row to the south pole, which is assumed to be the last vertex
-        south_pole_index = self._vertices_count * self._vertices_count - 1
+        south_pole_index = self._vertices_count * self._vertices_count
         south_pole_edges = np.stack((phi_indices[-1, :], np.full(self._vertices_count, south_pole_index)), axis=1)
 
-        # Combine all edges
-        edges = np.vstack((horizontal_edges, vertical_edges, last_to_first_edges, south_pole_edges))
-
-        return edges
+        return np.vstack((horizontal_edges, vertical_edges, last_to_first_edges, south_pole_edges))
 
     def get_vertices_count(self) -> int:
         return self._vertices_count

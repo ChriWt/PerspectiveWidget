@@ -17,9 +17,6 @@ class Cube(Shape):
                  rotation_z: int = 0) -> None:
         super().__init__(origin, self.VERTICES_COUNT, width, height, depth, rotation_x, rotation_y, rotation_z)
 
-        self._near_left_up = self.__calculate_near_left_up()
-        self._far_right_bottom = self.__calculate_far_right_bottom()
-
     def __calculate_near_left_up(self) -> Vector3:
         return Vector3(self._origin.x - self._width / 2, self._origin.y + self._height / 2, self._origin.z - self._depth / 2)
     
@@ -27,6 +24,9 @@ class Cube(Shape):
         return Vector3(self._origin.x + self._width / 2, self._origin.y - self._height / 2, self._origin.z + self._depth / 2)
     
     def get_vertices(self) -> List[Vector3]:
+        self._near_left_up = self.__calculate_near_left_up()
+        self._far_right_bottom = self.__calculate_far_right_bottom()
+
         return [
             self._near_left_up,                                                                   # LEFT, TOP, NEAR
             Vector3(self._near_left_up.x, self._far_right_bottom.y, self._near_left_up.z),        # LEFT, BOT, NEAR
