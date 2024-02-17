@@ -53,6 +53,3 @@ class Sphere(Shape):
         south_pole_edges = np.stack((phi_indices[-1, :], np.full(self._vertices_count, south_pole_index)), axis=1)
 
         return np.vstack((horizontal_edges, vertical_edges, last_to_first_edges, south_pole_edges))
-
-    def get_vertices_count(self) -> int:
-        return self._vertices_count

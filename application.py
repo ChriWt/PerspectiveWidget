@@ -32,10 +32,10 @@ if __name__ == "__main__":
     root.geometry(f"{APP_WIDHT}x{APP_HEIGHT}+{int(root.winfo_screenwidth()/2 - APP_WIDHT/2)}+{int(root.winfo_screenheight()/2 - APP_HEIGHT/2)}")
     
 
-    # root.add_shape(Sphere(Vector3(0, 0, 1200), vertices_count=8, width=400))
-    root.add_shape(Cube(Vector3(0, 0, 0), width=200, height=200, depth=200))
+    root.add_shape(Sphere(Vector3(0, 0, 1200), vertices_count=8, width=400))
+    # root.add_shape(Cube(Vector3(0, 0, 0), width=200, height=200, depth=200))
     # root.add_shape(Piramid(Vector3(0, 0, 1200), vertices_count=6, width=200, height=200, depth=200))
-    root.add_shape(Cilinder(Vector3(0, 0, 1200), vertices_count=6, width=200, height=200, depth=200))
+    # root.add_shape(Cilinder(Vector3(0, 0, 1200), vertices_count=6, width=200, height=200, depth=200))
     root.mainloop()
 
     
