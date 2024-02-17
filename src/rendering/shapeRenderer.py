@@ -1,6 +1,6 @@
 from src.rendering.rendererProperties import RendererProperties
 from src.shape.shape import Shape
-from src.vector3 import Vector3
+from src.utils.vector3 import Vector3
 
 from numpy import array, radians, sin, cos
 from tkinter import Canvas
@@ -8,6 +8,8 @@ import time
 
 
 class ShapeRenderer: 
+
+    EDGES_COLOR = "white"
 
     def __init__(self, canvas: Canvas, renderer_properties: RendererProperties) -> None:
         self._canvas = canvas
@@ -27,7 +29,7 @@ class ShapeRenderer:
         edges = shape.get_edges()
 
         for edge in edges:
-            self._canvas.create_line(vertices[edge[0]].x, vertices[edge[0]].y, vertices[edge[1]].x, vertices[edge[1]].y, fill="black", width=1)
+            self._canvas.create_line(vertices[edge[0]].x, vertices[edge[0]].y, vertices[edge[1]].x, vertices[edge[1]].y, fill=self.EDGES_COLOR, width=1)
 
         print(f"Rendering time: {time.time() - start:.4f}s")
 

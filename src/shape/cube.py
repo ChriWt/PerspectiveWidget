@@ -1,6 +1,6 @@
 from typing import List, Tuple
 from src.shape.shape import Shape
-from src.vector3 import Vector3
+from src.utils.vector3 import Vector3
 
 
 class Cube(Shape):

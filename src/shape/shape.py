@@ -1,8 +1,7 @@
-
+from src.utils.vector3 import Vector3
 
 from abc import ABC, abstractmethod
 from typing import List, Tuple
-from src.vector3 import Vector3
 
 
 class Shape(ABC):

@@ -1,12 +1,10 @@
-from random import randint
 from customtkinter import CTkFrame, CTkCanvas, IntVar, DoubleVar, CTkSlider, CTkLabel, CTkButton
-from numpy import tan, array, radians, sin, cos
-from src.rendering.shapeRenderer import ShapeRenderer
-from src.rendering.rendererProperties import RendererProperties
-from src.shape.shape import Shape
+from random import randint
 
-from src.shape.cube import Cube
-from src.vector3 import Vector3
+from src.rendering.rendererProperties import RendererProperties
+from src.rendering.shapeRenderer import ShapeRenderer
+from src.utils.vector3 import Vector3
+from src.shape.shape import Shape
 
     
 class Canvas3DRenderer(CTkFrame):
@@ -30,28 +28,28 @@ class Canvas3DRenderer(CTkFrame):
     INITIAL_TRANSLATION_Y = 200
     INITIAL_TRANSLATION_Z = 200
 
-    # Cube Dimension Constants
-    INITIAL_CUBE_WIDTH = 1
-    INITIAL_CUBE_HEIGHT = 1
-    INITIAL_CUBE_DEPTH = 1
+    # Shape Dimension Constants
+    INITIAL_SHAPE_WIDTH = 1
+    INITIAL_SHAPE_HEIGHT = 1
+    INITIAL_SHAPE_DEPTH = 1
 
     # Slider Range Constants
     FOV_SLIDER_RANGE = (1, 179)  # degrees
     SCALE_SLIDER_RANGE = (1, 1000)
     OFFSET_X_SLIDER_RANGE = (0, 1920)
     OFFSET_Y_SLIDER_RANGE = (0, 1080)
-    ASPECT_RATIO_SLIDER_RANGE = (0.1, 3)
     ROTATION_SLIDER_RANGE = (0, 360)  # degrees for X, Y, Z
     TRANSLATION_SLIDER_RANGE = (-1500, 1500)  # for X and Y, Z is (0, 1000)
     TRANSLATION_Z_SLIDER_RANGE = (0, 5000)
-    CUBE_DIMENSION_SLIDER_RANGE = (1, 500)  # for width, height, depth
+    SHAPE_DIMENSION_SLIDER_RANGE = (1, 500)  # for width, height, depth
     SHAPE_VERTICES_SLIDER_RANGE = (4, 30)
 
     # Mouse Interaction Constants
     TRANSLATION_Z_INCREMENT = 10  # value for translation Z on mouse wheel event
 
     # UI Constants
-    CANVAS_BACKGROUND_COLOR = "white"
+    CANVAS_BACKGROUND_COLOR = "black"
+    HORIZONTAL_LINE_COLOR = "white"
     FOCAL_POINT_COLOR = "red"
     FOCAL_POINT_SIZE_OFFSETS = (-3, 3)  # Used for drawing the oval representing the focal point
 
@@ -65,7 +63,7 @@ class Canvas3DRenderer(CTkFrame):
                  show_canvas_options: bool = True, 
                  show_rotation_options: bool = True,
                  show_translation_options: bool = True,
-                 show_cube_options: bool = True,
+                 show_shape_options: bool = True,
                  **kwargs):
         super().__init__(*args, width=width, height=height, **kwargs)
 
@@ -76,7 +74,7 @@ class Canvas3DRenderer(CTkFrame):
         self._show_canvas_options = show_canvas_options
         self._show_rotation_options = show_rotation_options
         self._show_translation_options = show_translation_options
-        self._show_cube_options = show_cube_options
+        self._show_shape_options = show_shape_options
         self._renderer_properties = None
 
         self.__init_variables()
@@ -88,7 +86,6 @@ class Canvas3DRenderer(CTkFrame):
         self.__display_focal_point()
 
     def __init_variables(self):
-        self._cube = None
         self._fov = IntVar(value=self.INITIAL_FOV)
         self._scale = DoubleVar(value=self.INITIAL_SCALE)
         self._offset_x = IntVar(value=self._width / 2)
@@ -102,9 +99,9 @@ class Canvas3DRenderer(CTkFrame):
         self._translation_x = IntVar(value=self.INITIAL_TRANSLATION_X)
         self._translation_y = IntVar(value=self.INITIAL_TRANSLATION_Y)
         self._translation_z = IntVar(value=self.INITIAL_TRANSLATION_Z)
-        self._cube_width = IntVar(value=self.INITIAL_CUBE_WIDTH)
-        self._cube_height = IntVar(value=self.INITIAL_CUBE_HEIGHT)
-        self._cube_depth = IntVar(value=self.INITIAL_CUBE_DEPTH)
+        self._shape_width = IntVar(value=self.INITIAL_SHAPE_WIDTH)
+        self._shape_height = IntVar(value=self.INITIAL_SHAPE_HEIGHT)
+        self._shape_depth = IntVar(value=self.INITIAL_SHAPE_DEPTH)
         self._shape_vertices = IntVar(value=0)
 
     def __init_renderer_properties(self) -> None:
@@ -184,7 +181,7 @@ class Canvas3DRenderer(CTkFrame):
         self._canvas_options_frame = CTkFrame(master=self._option_frame, width=1, height=1)
         self._rotation_options_frame = CTkFrame(master=self._option_frame, width=1, height=1)
         self._translation_options_frame = CTkFrame(master=self._option_frame, width=1, height=1)
-        self._cube_options_frame = CTkFrame(master=self._option_frame, width=1, height=1)
+        self._shape_options_frame = CTkFrame(master=self._option_frame, width=1, height=1)
 
     def __init_components(self):
         frame = CTkFrame(master=self._canvas_options_frame)
@@ -247,26 +244,26 @@ class Canvas3DRenderer(CTkFrame):
         CTkSlider(master=frame, variable=self._translation_z, from_=self.TRANSLATION_Z_SLIDER_RANGE[0], to=self.TRANSLATION_Z_SLIDER_RANGE[1], orientation=self.HORIZONTAL, command=self.__update_labels).pack(side="top")
         frame.pack(side="left" if self._orientation == self.HORIZONTAL else "top")
     
-        frame = CTkFrame(master=self._cube_options_frame)
-        self._cube_width_label = CTkLabel(master=frame, text=f"Cube Width ({self._cube_width.get()})")
-        self._cube_width_label.pack(side="top")
-        CTkSlider(master=frame, variable=self._cube_width, from_=self.CUBE_DIMENSION_SLIDER_RANGE[0], to=self.CUBE_DIMENSION_SLIDER_RANGE[1], orientation=self.HORIZONTAL, command=self.__update_labels).pack(side="top")
+        frame = CTkFrame(master=self._shape_options_frame)
+        self._shape_width_label = CTkLabel(master=frame, text=f"Shape Width ({self._shape_width.get()})")
+        self._shape_width_label.pack(side="top")
+        CTkSlider(master=frame, variable=self._shape_width, from_=self.SHAPE_DIMENSION_SLIDER_RANGE[0], to=self.SHAPE_DIMENSION_SLIDER_RANGE[1], orientation=self.HORIZONTAL, command=self.__update_labels).pack(side="top")
         frame.pack(side="left" if self._orientation == self.HORIZONTAL else "top")
 
-        frame = CTkFrame(master=self._cube_options_frame)
-        self._cube_height_label = CTkLabel(master=frame, text=f"Cube Height ({self._cube_height.get()})")
-        self._cube_height_label.pack(side="top")
-        CTkSlider(master=frame, variable=self._cube_height, from_=self.CUBE_DIMENSION_SLIDER_RANGE[0], to=self.CUBE_DIMENSION_SLIDER_RANGE[1], orientation=self.HORIZONTAL, command=self.__update_labels).pack(side="top")
+        frame = CTkFrame(master=self._shape_options_frame)
+        self._shape_height_label = CTkLabel(master=frame, text=f"Shape Height ({self._shape_height.get()})")
+        self._shape_height_label.pack(side="top")
+        CTkSlider(master=frame, variable=self._shape_height, from_=self.SHAPE_DIMENSION_SLIDER_RANGE[0], to=self.SHAPE_DIMENSION_SLIDER_RANGE[1], orientation=self.HORIZONTAL, command=self.__update_labels).pack(side="top")
         frame.pack(side="left" if self._orientation == self.HORIZONTAL else "top")
 
-        frame = CTkFrame(master=self._cube_options_frame)
-        self._cube_depth_label = CTkLabel(master=frame, text=f"Cube Depth ({self._cube_depth.get()})")
-        self._cube_depth_label.pack(side="top")
-        CTkSlider(master=frame, variable=self._cube_depth, from_=self.CUBE_DIMENSION_SLIDER_RANGE[0], to=self.CUBE_DIMENSION_SLIDER_RANGE[1], orientation=self.HORIZONTAL, command=self.__update_labels).pack(side="top")
+        frame = CTkFrame(master=self._shape_options_frame)
+        self._shape_depth_label = CTkLabel(master=frame, text=f"Shape Depth ({self._shape_depth.get()})")
+        self._shape_depth_label.pack(side="top")
+        CTkSlider(master=frame, variable=self._shape_depth, from_=self.SHAPE_DIMENSION_SLIDER_RANGE[0], to=self.SHAPE_DIMENSION_SLIDER_RANGE[1], orientation=self.HORIZONTAL, command=self.__update_labels).pack(side="top")
         frame.pack(side="left" if self._orientation == self.HORIZONTAL else "top")
 
-        frame = CTkFrame(master=self._cube_options_frame)
-        self._shape_vertices_label = CTkLabel(master=frame, text=f"Cube Vertices ({self._shape_vertices.get()})")
+        frame = CTkFrame(master=self._shape_options_frame)
+        self._shape_vertices_label = CTkLabel(master=frame, text=f"Shape Vertices ({self._shape_vertices.get()})")
         self._shape_vertices_label.pack(side="top")
         CTkSlider(master=frame, variable=self._shape_vertices, from_=self.SHAPE_VERTICES_SLIDER_RANGE[0], to=self.SHAPE_VERTICES_SLIDER_RANGE[1], orientation=self.HORIZONTAL, command=self.__update_labels).pack(side="top")
         frame.pack(side="left" if self._orientation == self.HORIZONTAL else "top")
@@ -293,9 +290,9 @@ class Canvas3DRenderer(CTkFrame):
         self._translation_x.trace_add("write", self.__update_shape_position)
         self._translation_y.trace_add("write", self.__update_shape_position)
         self._translation_z.trace_add("write", self.__update_shape_position)
-        self._cube_width.trace_add("write", self.__update_shape_size)
-        self._cube_height.trace_add("write", self.__update_shape_size)
-        self._cube_depth.trace_add("write", self.__update_shape_size)
+        self._shape_width.trace_add("write", self.__update_shape_size)
+        self._shape_height.trace_add("write", self.__update_shape_size)
+        self._shape_depth.trace_add("write", self.__update_shape_size)
         self._shape_vertices.trace_add("write", self.__update_shape_vertices)
 
     def __update_fov(self, *_) -> None:
@@ -323,9 +320,9 @@ class Canvas3DRenderer(CTkFrame):
         self.__render()
 
     def __update_shape_size(self, *_) -> None:
-        self._shape._width = self._cube_width.get()
-        self._shape._height = self._cube_height.get()
-        self._shape._depth = self._cube_depth.get()
+        self._shape._width = self._shape_width.get()
+        self._shape._height = self._shape_height.get()
+        self._shape._depth = self._shape_depth.get()
         self.__render()
 
     def __update_shape_vertices(self, *_) -> None:
@@ -348,7 +345,7 @@ class Canvas3DRenderer(CTkFrame):
             outline=self.FOCAL_POINT_COLOR)
         
     def __display_horizontal_line(self) -> None:
-        self._canvas.create_line(0, self._offset_y.get(), 1920, self._offset_y.get(), fill="black", width=1)
+        self._canvas.create_line(0, self._offset_y.get(), 1920, self._offset_y.get(), fill=self.HORIZONTAL_LINE_COLOR, width=1)
 
     def __update_labels(self, *args):
         self._fov_label.configure(text=f"Fov ({self._fov.get()})")
@@ -361,10 +358,10 @@ class Canvas3DRenderer(CTkFrame):
         self._translation_x_label.configure(text=f"Translation X ({self._translation_x.get()})")
         self._translation_y_label.configure(text=f"Translation Y ({self._translation_y.get()})")
         self._translation_z_label.configure(text=f"Translation Z ({self._translation_z.get()})")
-        self._cube_width_label.configure(text=f"Cube Width ({self._cube_width.get()})")
-        self._cube_height_label.configure(text=f"Cube Height ({self._cube_height.get()})")
-        self._cube_depth_label.configure(text=f"Cube Depth ({self._cube_depth.get()})")
-        self._shape_vertices_label.configure(text=f"Cube Vertices ({self._shape_vertices.get()})")
+        self._shape_width_label.configure(text=f"Shape Width ({self._shape_width.get()})")
+        self._shape_height_label.configure(text=f"Shape Height ({self._shape_height.get()})")
+        self._shape_depth_label.configure(text=f"Shape Depth ({self._shape_depth.get()})")
+        self._shape_vertices_label.configure(text=f"Shape Vertices ({self._shape_vertices.get()})")
         
     def __bind_size_change(self) -> None:        
         self.bind("<Configure>", self.__on_size_change)
@@ -405,8 +402,8 @@ class Canvas3DRenderer(CTkFrame):
         if self._show_translation_options:
             self._translation_options_frame.pack(**common_kwargs)
         
-        if self._show_cube_options:
-            self._cube_options_frame.pack(**common_kwargs)
+        if self._show_shape_options:
+            self._shape_options_frame.pack(**common_kwargs)
             
     def add_shape(self, shape: Shape) -> None:
         self._shape = shape
@@ -418,9 +415,9 @@ class Canvas3DRenderer(CTkFrame):
         rotation_y = shape.get_rotation_y()
         rotation_z = shape.get_rotation_z()
 
-        self._cube_width.set(width)
-        self._cube_height.set(height)
-        self._cube_depth.set(depth)
+        self._shape_width.set(width)
+        self._shape_height.set(height)
+        self._shape_depth.set(depth)
         self._translation_x.set(translation.x)
         self._translation_y.set(translation.y)
         self._translation_z.set(translation.z)

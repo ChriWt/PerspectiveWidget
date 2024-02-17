@@ -1,7 +1,8 @@
-import math
 from typing import List, Optional, Tuple
+import math
+
+from src.utils.vector3 import Vector3
 from src.shape.shape import Shape
-from src.vector3 import Vector3
 
 
 class Piramid(Shape):

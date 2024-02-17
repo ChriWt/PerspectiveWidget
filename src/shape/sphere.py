@@ -1,5 +1,5 @@
 from src.shape.shape import Shape
-from src.vector3 import Vector3
+from src.utils.vector3 import Vector3
 from typing import List, Optional
 from numpy import sin, cos
 from math import pi
