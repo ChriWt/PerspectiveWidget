@@ -1,3 +1,4 @@
+import time
 from src.rendering.rendererProperties import RendererProperties
 from src.shape.shape import Shape
 from src.utils.vector3 import Vector3
@@ -36,7 +37,7 @@ class ShapeRenderer:
 
         rotated_vertex_4d = self.__apply_rotation(vertex_4d)
 
-        translated_vertex_4d = self.__translate_vertex(rotated_vertex_4d, self._rendering_shape._velocity)
+        translated_vertex_4d = self.__translate_vertex(rotated_vertex_4d, self._rendering_shape.get_translation())
 
         projected_vertex = self._renderer_properties.get_projection_matrix() @ translated_vertex_4d
 
@@ -49,9 +50,11 @@ class ShapeRenderer:
         return Vector3(projected_vertex.x * scale + offset_x, projected_vertex.y * scale + offset_y, projected_vertex.z)
 
     def __apply_rotation(self, vertex_4d: array) -> array:
-        rotated_vertex_4d = self.__rotation_matrix_y(self._rendering_shape._rotation_y) @ \
-                            self.__rotation_matrix_x(self._rendering_shape._rotation_x) @ \
-                            self.__rotation_matrix_z(self._rendering_shape._rotation_z) @ \
+        rotation = self._rendering_shape.get_rotation()
+
+        rotated_vertex_4d = self.__rotation_matrix_y(rotation.y) @ \
+                            self.__rotation_matrix_x(rotation.x) @ \
+                            self.__rotation_matrix_z(rotation.z) @ \
                             vertex_4d
 
         origin = self._rendering_shape.get_origin()
