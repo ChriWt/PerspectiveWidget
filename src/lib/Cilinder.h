@@ -8,7 +8,7 @@
 #include "Shape3D.h"
 #endif
 
-#if !defined(M_PI)
+#if !defined(M_2PI)
 #define M_2PI 6.283185307179586
 #endif
 

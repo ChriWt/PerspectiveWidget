@@ -10,6 +10,9 @@ from src.shape.sphere import Sphere
 from src.shape.shape import Shape
 from src.shape.cube import Cube
 
+# import sys
+# sys.path.append(r'./release/Release')
+# import CShape3D
 
     
 class Canvas3DRenderer(CTkFrame):
@@ -47,7 +50,7 @@ class Canvas3DRenderer(CTkFrame):
     TRANSLATION_SLIDER_RANGE = (-1500, 1500)  # for X and Y, Z is (0, 1000)
     TRANSLATION_Z_SLIDER_RANGE = (0, 10000)
     SHAPE_DIMENSION_SLIDER_RANGE = (1, 1000)  # for width, height, depth
-    SHAPE_VERTICES_SLIDER_RANGE = (4, 500) # 30
+    SHAPE_VERTICES_SLIDER_RANGE = (4, 30)
 
     # Mouse Interaction Constants
     TRANSLATION_Z_INCREMENT = 10  # value for translation Z on mouse wheel event
@@ -443,7 +446,7 @@ class Canvas3DRenderer(CTkFrame):
         self._shape = shape
 
         width, height, depth = shape.get_width(), shape.get_height(), shape.get_depth()
-        vertices_count = shape.get_vertices_count()
+        vertices_count = shape.get_vertice_count()
         rotation_x = shape.get_rotation_x()
         rotation_y = shape.get_rotation_y()
         rotation_z = shape.get_rotation_z()

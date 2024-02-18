@@ -1,9 +1,71 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
-#include "Vector3.h"
 #include "Sphere.h"
 #include "Cube.h"
 #include "Piramid.h"
 #include "Cilinder.h"
 
+namespace py = pybind11;
+
+PYBIND11_MODULE(CShape3D, m){
+    m.doc() = "3D shape manipulation module";
+
+    py::class_<Vector3>(m, "Vector3")
+        .def(py::init<float, float, float>())
+        .def("__add__", &Vector3::operator+)
+        .def("__sub__", &Vector3::operator-)
+        .def("__mul__", &Vector3::operator*, py::is_operator())
+        .def("__truediv__", &Vector3::operator/, py::is_operator())
+        .def("__repr__", &Vector3::toString)
+        .def("__eq__", &Vector3::operator==)
+        .def_readwrite("x", &Vector3::x)
+        .def_readwrite("y", &Vector3::y)
+        .def_readwrite("z", &Vector3::z);
+
+
+    py::class_<Shape3D>(m, "Shape3D")
+        .def(py::init<>())
+        .def(py::init<Vector3, Vector3, Vector3, int, int, int, int>())
+        .def("get_origin", &Shape3D::getOrigin)
+        .def("get_rotation", &Shape3D::getRotation)
+        .def("get_translation", &Shape3D::getTranslation)
+        .def("get_vertice_count", &Shape3D::getVerticeCount)
+        .def("get_width", &Shape3D::getWidth)
+        .def("get_height", &Shape3D::getHeight)
+        .def("get_depth", &Shape3D::getDepth)
+        .def("set_origin", &Shape3D::setOrigin)
+        .def("set_rotation", &Shape3D::setRotation)
+        .def("set_translation", &Shape3D::setTranslation)
+        .def("set_vertice_count", &Shape3D::setVerticeCount)
+        .def("set_width", &Shape3D::setWidth)
+        .def("set_height", &Shape3D::setHeight)
+        .def("set_depth", &Shape3D::setDepth)
+        .def("to_string", &Shape3D::toString)
+        .def("get_vertices", &Shape3D::getVertices)
+        .def("get_edges", &Shape3D::getEdges);
+
+    py::class_<Cilinder, Shape3D>(m, "Cilinder")
+        .def(py::init<>())
+        .def(py::init<Vector3, Vector3, Vector3, int, int, int, int>())
+        .def("get_vertices", &Cilinder::getVertices)
+        .def("get_edges", &Cilinder::getEdges);
+
+    py::class_<Sphere, Shape3D>(m, "Sphere")
+        .def(py::init<>())
+        .def(py::init<Vector3, Vector3, Vector3, int, int, int, int>())
+        .def("get_vertices", &Sphere::getVertices)
+        .def("get_edges", &Sphere::getEdges);
+
+    py::class_<Cube, Shape3D>(m, "Cube")
+        .def(py::init<>())
+        .def(py::init<Vector3, Vector3, Vector3, int, int, int>())
+        .def("get_vertices", &Cube::getVertices)
+        .def("get_edges", &Cube::getEdges);
+
+    py::class_<Piramid, Shape3D>(m, "Piramid")
+        .def(py::init<>())
+        .def(py::init<Vector3, Vector3, Vector3, int, int, int, int>())
+        .def("get_vertices", &Piramid::getVertices)
+        .def("get_edges", &Piramid::getEdges);
+}

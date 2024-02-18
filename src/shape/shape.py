@@ -29,7 +29,7 @@ class Shape(ABC):
     def get_origin(self) -> Vector3:
         return self._origin
 
-    def get_vertices_count(self) -> int:
+    def get_vertice_count(self) -> int:
         return self._vertices_count
     
     def get_width(self) -> int:
