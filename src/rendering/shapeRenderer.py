@@ -19,7 +19,7 @@ class ShapeRenderer:
         if shape is None: 
             return
         
-        start = time.time()
+        # start = time.time()
         
         self._rendering_shape = shape
         
@@ -31,7 +31,7 @@ class ShapeRenderer:
         for edge in edges:
             self._canvas.create_line(vertices[edge[0]].x, vertices[edge[0]].y, vertices[edge[1]].x, vertices[edge[1]].y, fill=self.EDGES_COLOR, width=1)
 
-        print(f"Rendering time: {time.time() - start:.4f}s")
+        # print(f"Rendering time: {time.time() - start:.4f}s")
 
     def __apply_projection(self, vertex: Vector3) -> None:
         origin = self._rendering_shape.get_origin()
