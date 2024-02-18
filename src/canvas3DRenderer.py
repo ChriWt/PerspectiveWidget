@@ -3,12 +3,6 @@ from random import randint
 
 from src.rendering.rendererProperties import RendererProperties
 from src.rendering.shapeRenderer import ShapeRenderer
-# from src.shape.cilinder import Cilinder
-# from src.shape.piramid import Piramid
-# from src.utils.vector3 import Vector3
-# from src.shape.sphere import Sphere
-# from src.shape.shape import Shape
-# from src.shape.cube import Cube
 
 import sys
 sys.path.append(r'./release/Release')
