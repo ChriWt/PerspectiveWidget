@@ -47,7 +47,7 @@ class Canvas3DRenderer(CTkFrame):
     TRANSLATION_SLIDER_RANGE = (-1500, 1500)  # for X and Y, Z is (0, 1000)
     TRANSLATION_Z_SLIDER_RANGE = (0, 10000)
     SHAPE_DIMENSION_SLIDER_RANGE = (1, 1000)  # for width, height, depth
-    SHAPE_VERTICES_SLIDER_RANGE = (4, 30)
+    SHAPE_VERTICES_SLIDER_RANGE = (4, 500) # 30
 
     # Mouse Interaction Constants
     TRANSLATION_Z_INCREMENT = 10  # value for translation Z on mouse wheel event
