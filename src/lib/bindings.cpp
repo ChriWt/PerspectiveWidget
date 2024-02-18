@@ -48,24 +48,32 @@ PYBIND11_MODULE(CShape3D, m){
     py::class_<Cilinder, Shape3D>(m, "Cilinder")
         .def(py::init<>())
         .def(py::init<Vector3, Vector3, Vector3, int, int, int, int>())
+        .def(py::init<Vector3, int, int, int, int>())
+        .def(py::init<Vector3, int, int>())
         .def("get_vertices", &Cilinder::getVertices)
         .def("get_edges", &Cilinder::getEdges);
 
     py::class_<Sphere, Shape3D>(m, "Sphere")
         .def(py::init<>())
         .def(py::init<Vector3, Vector3, Vector3, int, int, int, int>())
+        .def(py::init<Vector3, int, int, int, int>())
+        .def(py::init<Vector3, int, int>())
         .def("get_vertices", &Sphere::getVertices)
         .def("get_edges", &Sphere::getEdges);
 
     py::class_<Cube, Shape3D>(m, "Cube")
         .def(py::init<>())
         .def(py::init<Vector3, Vector3, Vector3, int, int, int>())
+        .def(py::init<Vector3, int, int, int>())
+        .def(py::init<Vector3, int>())
         .def("get_vertices", &Cube::getVertices)
         .def("get_edges", &Cube::getEdges);
 
     py::class_<Piramid, Shape3D>(m, "Piramid")
         .def(py::init<>())
         .def(py::init<Vector3, Vector3, Vector3, int, int, int, int>())
+        .def(py::init<Vector3, int, int, int, int>())
+        .def(py::init<Vector3, int, int>())
         .def("get_vertices", &Piramid::getVertices)
         .def("get_edges", &Piramid::getEdges);
 }

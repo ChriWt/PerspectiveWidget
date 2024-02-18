@@ -1,20 +1,9 @@
-
-#if !defined(__VECTOR3_H__)
-#define __VECTOR3_H__
-#include "Vector3.h"
-#endif
-
-#if !defined(__SHAPE3D_H__)
-#define __SHAPE3D_H__
-#include "Shape3D.h"
-#endif
-
-// #if !defined(M_PI)
-// #define M_PI 3.14159265359
-// #endif
-
 #include <cmath>
 #include <numeric>
+
+#if !defined(M_PI)
+#define M_PI 3.14159265359
+#endif
 
 
 class Sphere: public Shape3D {
@@ -30,6 +19,12 @@ class Sphere: public Shape3D {
 
         Sphere(Vector3 origin, Vector3 rotation, Vector3 translation, int verticeCount, int width, int height, int depth): 
             Shape3D(origin, rotation, translation, verticeCount, width, this->getDefaultIfEmpty(width, height), this->getDefaultIfEmpty(width, depth)) {}
+
+        Sphere(Vector3 origin, int verticeCount, int width, int height, int depth):
+            Shape3D(origin, Vector3(0, 0, 0), Vector3(0, 0, 0), verticeCount, width, this->getDefaultIfEmpty(width, height), this->getDefaultIfEmpty(width, depth)) {}
+
+        Sphere(Vector3 origin, int verticeCount, int width):
+            Shape3D(origin, Vector3(0, 0, 0), Vector3(0, 0, 0), verticeCount, width, width, width) {}
 
         std::vector<Vector3> getVertices() {
             std::vector<Vector3> vertices;

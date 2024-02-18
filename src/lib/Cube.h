@@ -1,13 +1,3 @@
-#if !defined(__VECTOR3_H__)
-#define __VECTOR3_H__
-#include "Vector3.h"
-#endif
-
-#if !defined(__SHAPE3D_H__)
-#define __SHAPE3D_H__
-#include "Shape3D.h"
-#endif
-
 
 class Cube: public Shape3D {
 
@@ -31,6 +21,12 @@ class Cube: public Shape3D {
 
         Cube(Vector3 origin, Vector3 rotation, Vector3 translation, int width, int height, int depth): 
             Shape3D(origin, rotation, translation, VERTICE_COUNT, width, height, depth) {}
+
+        Cube(Vector3 origin, int width, int height, int depth): 
+            Shape3D(origin, Vector3(0, 0, 0), Vector3(0, 0, 0), VERTICE_COUNT, width, height, depth) {}
+
+        Cube(Vector3 origin, int width): 
+            Shape3D(origin, Vector3(0, 0, 0), Vector3(0, 0, 0), VERTICE_COUNT, width, width, width) {}
 
         std::vector<Vector3> getVertices() {
             Vector3 nearLeftUp = calculateNearLeftUp();
