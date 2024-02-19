@@ -35,8 +35,11 @@ if __name__ == "__main__":
     APP_HEIGHT = 850
 
     root = Main(width=APP_WIDHT, height=APP_HEIGHT)
-    root.geometry(f"{APP_WIDHT}x{APP_HEIGHT}+{int(root.winfo_screenwidth()/2 - APP_WIDHT/2)}+{int(root.winfo_screenheight()/2 - APP_HEIGHT/2)}")
     
+    root.title("3D Shapes Renderer")
+    root.geometry(f"{APP_WIDHT}x{APP_HEIGHT}+{int(root.winfo_screenwidth()/2 - APP_WIDHT/2)}+{int(root.winfo_screenheight()/2 - APP_HEIGHT/2)}")
+    root.after(0, lambda:root.state('zoomed'))
+
     root.display_sphere()
     root.mainloop()
 

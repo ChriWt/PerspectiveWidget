@@ -1,3 +1,4 @@
+import time
 from customtkinter import CTkFrame, CTkCanvas, IntVar, DoubleVar, CTkSlider, CTkLabel, CTkButton
 from random import randint
 
@@ -278,27 +279,23 @@ class Canvas3DRenderer(CTkFrame):
         CTkButton(master=self._option_frame, text="Randomize", command=self.__randomize_shape_properties).pack(side="bottom" if self._orientation == self.VERTICAL else "right", padx=10 if self._orientation == self.HORIZONTAL else 0, pady=20 if self._orientation == self.VERTICAL else 10)
 
     def display_cube(self) -> None:
-        self.__set_display_scale(2500)
-        cube = Cube(Vector3(0, 0, 2000), 500)
-        cube.set_rotation(Vector3(32, 335, 0))
+        self.__set_display_scale(1100)
+        cube = Cube(Vector3(), Vector3(32, 335, 0), Vector3(0, 0, 1500), 500, 500, 500)
         self.add_shape(cube)
 
     def display_sphere(self) -> None:
-        self.__set_display_scale(625)
-        sphere = Sphere(Vector3(0, 0, 600), 8, 500)
-        sphere.set_rotation(Vector3(16, 323, 0))
+        self.__set_display_scale(900)
+        sphere = Sphere(Vector3(), Vector3(16, 323, 0), Vector3(0, 0, 1500), 8, 500, 500, 500)
         self.add_shape(sphere)
 
     def display_piramid(self) -> None:
-        self.__set_display_scale(2500)
-        piramid = Piramid(Vector3(0, 0, 2000), 4, 250, 500, 250)
-        piramid.set_rotation(Vector3(160, 330, 0))
+        self.__set_display_scale(1500)
+        piramid = Piramid(Vector3(), Vector3(160, 330, 0), Vector3(0, 200, 1500), 6, 250, 500, 250)
         self.add_shape(piramid)
 
     def display_cilinder(self) -> None:
-        self.__set_display_scale(2500)
-        cilinder = Cilinder(Vector3(0, 0, 2000), 30, 250, 300, 250)
-        cilinder.set_rotation(Vector3(160, 330, 0))
+        self.__set_display_scale(1500)
+        cilinder = Cilinder(Vector3(), Vector3(160, 330, 0), Vector3(0, 0, 1500), 30, 250, 300, 250)
         self.add_shape(cilinder)
 
     def __set_display_scale(self, scale: int) -> None:
@@ -451,7 +448,7 @@ class Canvas3DRenderer(CTkFrame):
         width, height, depth = shape.get_width(), shape.get_height(), shape.get_depth()
         vertices_count = shape.get_vertice_count()
         rotation = shape.get_rotation()
-        origin = shape.get_origin()
+        translation = shape.get_translation()
 
         if isinstance(shape, Cube):
             self._shape_vertices_option_frame.pack_forget()
@@ -459,16 +456,16 @@ class Canvas3DRenderer(CTkFrame):
             self._shape_vertices_option_frame.pack(side="left" if self._orientation == self.HORIZONTAL else "top")
 
         if isinstance(shape, Sphere):
-            self._shape_vertices_slider.configure(from_=4, to=30)
+            self._shape_vertices_slider.configure(from_=4, to=150)
         else:
             self._shape_vertices_slider.configure(from_=self.SHAPE_VERTICES_SLIDER_RANGE[0], to=self.SHAPE_VERTICES_SLIDER_RANGE[1])
 
         self._shape_width.set(width)
         self._shape_height.set(height)
         self._shape_depth.set(depth)
-        self._translation_x.set(origin.x)
-        self._translation_y.set(origin.y)
-        self._translation_z.set(origin.z)
+        self._translation_x.set(translation.x)
+        self._translation_y.set(translation.y)
+        self._translation_z.set(translation.z)
         self._shape_vertices.set(vertices_count)
         self._rotation_x.set(rotation.x)
         self._rotation_y.set(rotation.y)
@@ -488,8 +485,21 @@ class Canvas3DRenderer(CTkFrame):
     def __start_rendering(self) -> None:
         if self._shape is None: 
             return
+
+        # start = time.time()
         
         edges = self._renderer.render(self._shape)
 
-        for edge in edges:
-            self._canvas.create_line(edge.start.x, edge.start.y, edge.end.x, edge.end.y, fill=self.EDGES_COLOR, width=1)
+        # end = time.time()
+        # print(f"Rendering time: {end - start} seconds")
+
+        start1 = time.time()
+        self._canvas.create_line(*edges, fill=self.EDGES_COLOR, width=1)
+
+
+        # for edge in edges:
+        #     self._canvas.create_line(edge.start.x, edge.start.y, edge.end.x, edge.end.y, fill=self.EDGES_COLOR, width=1)
+        
+        
+        # end1 = time.time()
+        # print(f"Drawing time: {end1 - start1} seconds\n")

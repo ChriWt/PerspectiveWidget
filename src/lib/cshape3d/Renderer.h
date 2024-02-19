@@ -32,21 +32,22 @@ class Renderer {
         bool rotationMatrixYInitialized;
         bool rotationMatrixZInitialized;
 
-        std::vector<Edge> startRendering() {
-            std::vector<Edge> edges;
+        std::vector<std::tuple<int, int>> startRendering() {
+            std::vector<std::tuple<int, int>> edges;
             std::vector<Vector3> vertices = this->projectedVertices();
-
-            // rotationMatrixXInitialized = false;
-            // rotationMatrixYInitialized = false;
-            // rotationMatrixZInitialized = false;
 
             std::vector<std::tuple<int, int>> connectinVertices = shape.get()->getEdges();
             
-
             for (std::tuple<int, int> connection : connectinVertices) {
-                Vector2 start = Vector2(vertices[std::get<0>(connection)].x, vertices[std::get<0>(connection)].y);
-                Vector2 end = Vector2(vertices[std::get<1>(connection)].x, vertices[std::get<1>(connection)].y);
-                edges.push_back(Edge(start, end));
+                int start = std::get<0>(connection);
+                int end = std::get<1>(connection);
+
+                Vector3 startVertex = vertices[start];
+                Vector3 endVertex = vertices[end];
+
+                edges.push_back(std::make_tuple(startVertex.x, startVertex.y));
+                edges.push_back(std::make_tuple(endVertex.x, endVertex.y));
+                edges.push_back(std::make_tuple(startVertex.x, startVertex.y));
             }
 
             return edges;
@@ -205,10 +206,9 @@ class Renderer {
             this->buildProjectionMatrix();
         }
 
-        std::vector<Edge> render(Shape3D& shape) {
+        std::vector<std::tuple<int, int>> render(Shape3D& shape) {
             resetRotationMatrix();
             this->shape = std::unique_ptr<Shape3D>(shape.clone());
-            
             return startRendering();
         }
 
@@ -217,7 +217,7 @@ class Renderer {
             buildProjectionMatrix();
         }
 
-        std::vector<Edge> setRenderingPropertiesAndRender(RenderingProperties renderingProperties) {
+        std::vector<std::tuple<int, int>> setRenderingPropertiesAndRender(RenderingProperties renderingProperties) {
             setRenderingProperties(renderingProperties);
             resetRotationMatrix();
             return startRendering();
