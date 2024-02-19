@@ -2,7 +2,7 @@
 #include <list>
 #include <vector>
 
-#include "Vector3.h"
+#include "../vector/Vector3.h"
 
 #ifndef __SHAPE3D_H__
 #define __SHAPE3D_H__

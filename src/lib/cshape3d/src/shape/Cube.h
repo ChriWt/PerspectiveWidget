@@ -1,5 +1,5 @@
-#include "Vector3.h"
-#include "Shape3D.h"
+#include "../vector/Vector3.h"
+#include "../shape/Shape3D.h"
 
 
 class Cube: public Shape3D {

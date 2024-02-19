@@ -1,7 +1,7 @@
 from customtkinter import CTk
 
 import sys
-sys.path.append(r'./release/Release')
+sys.path.append(r'./src/lib/cshape3d/bin')
 
 from src.canvas3DRenderer import Canvas3DRenderer
 

@@ -5,8 +5,8 @@
 #define M_PI 3.14159265359
 #endif
 
-#include "Vector3.h"
-#include "Shape3D.h"
+#include "../vector/Vector3.h"
+#include "../shape/Shape3D.h"
 
 
 class Sphere: public Shape3D {

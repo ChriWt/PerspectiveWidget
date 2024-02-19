@@ -1,31 +1,19 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
-#include "Sphere.h"
-#include "Cube.h"
-#include "Piramid.h"
-#include "Cilinder.h"
+#include "src/shape/Sphere.h"
+#include "src/shape/Cube.h"
+#include "src/shape/Piramid.h"
+#include "src/shape/Cilinder.h"
 
-#include "Renderer.h"
-#include "RenderingProperties.h"
+#include "src/renderer/Renderer.h"
+#include "src/renderer/RenderingProperties.h"
 
 
 namespace py = pybind11;
 
 PYBIND11_MODULE(CShape3D, m){
     m.doc() = "3D shape manipulation module";
-
-    py::class_<Vector2>(m, "Vector2")
-        .def(py::init<>())
-        .def(py::init<float, float>())
-        .def("__add__", &Vector2::operator+)
-        .def("__sub__", &Vector2::operator-)
-        .def("__mul__", &Vector2::operator*, py::is_operator())
-        .def("__truediv__", &Vector2::operator/, py::is_operator())
-        .def("__repr__", &Vector2::toString)
-        .def("__eq__", &Vector2::operator==)
-        .def_readwrite("x", &Vector2::x)
-        .def_readwrite("y", &Vector2::y);
 
     py::class_<Vector3>(m, "Vector3")
         .def(py::init<>())
@@ -53,13 +41,6 @@ PYBIND11_MODULE(CShape3D, m){
         .def_readwrite("y", &Vector4::y)
         .def_readwrite("z", &Vector4::z)
         .def_readwrite("w", &Vector4::w);
-
-    py::class_<Edge>(m, "Edge")
-        .def(py::init<>())
-        .def(py::init<Vector2, Vector2>())
-        .def("__eq__", &Edge::operator==)
-        .def_readwrite("start", &Edge::start)
-        .def_readwrite("end", &Edge::end);
 
     py::class_<Shape3D>(m, "Shape3D")
         .def(py::init<>())

@@ -3,10 +3,9 @@
 #include <cmath>
 #include <iostream>
 
-#include "Shape3D.h"
-#include "Vector3.h"
-#include "Vector4.h"
-#include "Edge.h"
+#include "../vector/Vector3.h"
+#include "../vector/Vector4.h"
+#include "../shape/Shape3D.h"
 #include "RenderingProperties.h"
 
 #ifndef M_PI

@@ -485,21 +485,5 @@ class Canvas3DRenderer(CTkFrame):
     def __start_rendering(self) -> None:
         if self._shape is None: 
             return
-
-        # start = time.time()
-        
         edges = self._renderer.render(self._shape)
-
-        # end = time.time()
-        # print(f"Rendering time: {end - start} seconds")
-
-        start1 = time.time()
         self._canvas.create_line(*edges, fill=self.EDGES_COLOR, width=1)
-
-
-        # for edge in edges:
-        #     self._canvas.create_line(edge.start.x, edge.start.y, edge.end.x, edge.end.y, fill=self.EDGES_COLOR, width=1)
-        
-        
-        # end1 = time.time()
-        # print(f"Drawing time: {end1 - start1} seconds\n")

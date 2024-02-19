@@ -4,8 +4,8 @@
 #define M_2PI 6.283185307179586
 #endif
 
-#include "Vector3.h"
-#include "Shape3D.h"
+#include "../vector/Vector3.h"
+#include "../shape/Shape3D.h"
 
 
 class Cilinder: public Shape3D {
