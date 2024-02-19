@@ -20,7 +20,7 @@ class Renderer {
 
     private:
 
-        std::shared_ptr<Shape3D> shape;
+        std::unique_ptr<Shape3D> shape;
         RenderingProperties renderingProperties;
 
         Matrix4x4 rotationMatrixX;
@@ -28,27 +28,32 @@ class Renderer {
         Matrix4x4 rotationMatrixZ;
         Matrix4x4 projectionMatrix;
 
-        bool rotationMatrixXInitialized = false;
-        bool rotationMatrixYInitialized = false;
-        bool rotationMatrixZInitialized = false;
+        bool rotationMatrixXInitialized;
+        bool rotationMatrixYInitialized;
+        bool rotationMatrixZInitialized;
 
         std::vector<Edge> startRendering() {
             std::vector<Edge> edges;
             std::vector<Vector3> vertices = this->projectedVertices();
 
-            std::vector<std::tuple<int, int>> connectinVertices = this->shape->getEdges();
+            // rotationMatrixXInitialized = false;
+            // rotationMatrixYInitialized = false;
+            // rotationMatrixZInitialized = false;
+
+            std::vector<std::tuple<int, int>> connectinVertices = shape.get()->getEdges();
+            
 
             for (std::tuple<int, int> connection : connectinVertices) {
                 Vector2 start = Vector2(vertices[std::get<0>(connection)].x, vertices[std::get<0>(connection)].y);
                 Vector2 end = Vector2(vertices[std::get<1>(connection)].x, vertices[std::get<1>(connection)].y);
-                edges.emplace_back(Edge(start, end));
+                edges.push_back(Edge(start, end));
             }
 
             return edges;
         }
 
         std::vector<Vector3> projectedVertices() {
-            std::vector<Vector3> vertices = this->shape->getVertices();
+            std::vector<Vector3> vertices = shape.get()->getVertices();
             std::vector<Vector3> projectedVertices;
 
             for (Vector3 vertex : vertices) {
@@ -59,12 +64,12 @@ class Renderer {
         }
 
         Vector3 projectVertex(Vector3 vertex) {
-            Vector3 centeredVetex = vertex - this->shape->getOrigin();
+            Vector3 centeredVetex = vertex - shape.get()->getOrigin();
 
             Vector4 vertex4d = Vector4(centeredVetex.x, centeredVetex.y, centeredVetex.z, 1);
 
             vertex4d = applyRotation(vertex4d);
-            vertex4d = applyTranslation(vertex4d, this->shape->getTranslation());
+            vertex4d = applyTranslation(vertex4d, shape.get()->getTranslation());
             vertex4d = multiplyMatrixVector(this->projectionMatrix, vertex4d);
             Vector3 projectedVertex = normalizeProjection(vertex4d);
 
@@ -80,7 +85,7 @@ class Renderer {
             vertex = multiplyMatrixVector(getRotationMatrixX(), vertex);
             vertex = multiplyMatrixVector(getRotationMatrixZ(), vertex);
 
-            Vector3 origin = this->shape->getOrigin();
+            Vector3 origin = shape.get()->getOrigin();
             vertex.x += origin.x;
             vertex.y += origin.y;
             vertex.z += origin.z;
@@ -90,7 +95,7 @@ class Renderer {
 
         Matrix4x4 getRotationMatrixX() {
             if (!rotationMatrixXInitialized) {
-                int degree = this->shape->getRotation().x;
+                int degree = shape.get()->getRotation().x;
                 float radian = radians(degree);
 
                 this->rotationMatrixX = {{
@@ -107,7 +112,7 @@ class Renderer {
 
         Matrix4x4 getRotationMatrixY() {
             if (!rotationMatrixYInitialized) {
-                int degree = this->shape->getRotation().y;
+                int degree = shape.get()->getRotation().y;
                 float radian = radians(degree);
 
                 this->rotationMatrixY = {{
@@ -124,7 +129,7 @@ class Renderer {
 
         Matrix4x4 getRotationMatrixZ() {
             if (!rotationMatrixZInitialized) {
-                int degree = this->shape->getRotation().z;
+                int degree = shape.get()->getRotation().z;
                 float radian = radians(degree);
 
                 this->rotationMatrixZ = {{
@@ -149,8 +154,8 @@ class Renderer {
         }
 
         Vector4 applyTranslation(Vector4 vertex, Vector3 translation) {
-            vertex.x += translation.x;
-            vertex.y += translation.y;
+            vertex.x += -translation.x;
+            vertex.y += -translation.y;
             vertex.z += translation.z;
 
             return vertex;
@@ -184,6 +189,17 @@ class Renderer {
             return degree * (M_PI / 180);
         }
 
+        void resetRotationMatrixIfNeeded(Shape3D& shape) {
+            if (this->shape != nullptr && this->shape.get()->getRotation() != shape.getRotation()) {
+                Vector3 newRotation = shape.getRotation();
+                Vector3 oldRotation = this->shape.get()->getRotation();
+
+                rotationMatrixXInitialized = newRotation.x != oldRotation.x;
+                rotationMatrixYInitialized = newRotation.y != oldRotation.y;
+                rotationMatrixZInitialized = newRotation.z != oldRotation.z;
+            }
+        }
+
     public:
 
         Renderer() : renderingProperties(RenderingProperties()) {
@@ -194,18 +210,20 @@ class Renderer {
             this->buildProjectionMatrix();
         }
 
-        std::vector<Edge> render(std::shared_ptr<Shape3D> shape) {
-            this->shape = shape;
-            return this->startRendering();
+        std::vector<Edge> render(Shape3D& shape) {
+            resetRotationMatrixIfNeeded(shape);
+            this->shape = std::unique_ptr<Shape3D>(shape.clone());
+            
+            return startRendering();
         }
 
         void setRenderingProperties(RenderingProperties renderingProperties) {
             this->renderingProperties = renderingProperties;
-            this->buildProjectionMatrix();
+            buildProjectionMatrix();
         }
 
-        void setRenderingPropertiesAndRender(RenderingProperties renderingProperties) {
-            this->setRenderingProperties(renderingProperties);
-            this->startRendering();
+        std::vector<Edge> setRenderingPropertiesAndRender(RenderingProperties renderingProperties) {
+            setRenderingProperties(renderingProperties);
+            return startRendering();
         }
 };

@@ -11,7 +11,7 @@ class RenderingProperties {
     public:
 
         RenderingProperties() : 
-            fov(60), offsetX(400), offsetY(400), scale(150.0f), aspetRatio(1.0f), near(0.1f), far(100.0f) {}
+            fov(90), offsetX(400), offsetY(400), scale(150.0f), aspetRatio(1.0f), near(0.1f), far(100.0f) {}
 
         RenderingProperties(int fov, int offsetX, int offsetY, float scale, float aspetRatio, float near, float far) : 
             fov(fov), offsetX(offsetX), offsetY(offsetY), scale(scale), aspetRatio(aspetRatio), near(near), far(far) {}

@@ -97,6 +97,10 @@ class Shape3D {
         virtual std::vector<std::tuple<int, int>> getEdges() {
             return std::vector<std::tuple<int, int>>();
         }
+
+        virtual Shape3D* clone() {
+            return new Shape3D(origin, rotation, translation, verticeCount, width, height, depth);
+        }
 };
 
 #endif

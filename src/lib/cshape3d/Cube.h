@@ -63,4 +63,8 @@ class Cube: public Shape3D {
                 std::make_tuple(3, 4)
             };
         }
+
+        Shape3D* clone() {
+            return new Cube(getOrigin(), getRotation(), getTranslation(), getWidth(), getHeight(), getDepth());
+        }
 };

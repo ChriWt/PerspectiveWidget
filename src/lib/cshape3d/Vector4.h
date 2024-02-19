@@ -1,3 +1,4 @@
+#include <string>
 
 #ifndef __VECTOR4_H__
 #define __VECTOR4_H__

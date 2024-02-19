@@ -6,6 +6,9 @@
 #include "Piramid.h"
 #include "Cilinder.h"
 
+#include "Renderer.h"
+#include "RenderingProperties.h"
+
 
 void assertVector3Equals() {
     std::cout << "Running assertVector3Equals" << std::endl;
@@ -235,6 +238,16 @@ void assertCilinder() {
     assertCiliinderEdgesCount();
 }
 
+void assertRenderer() {
+    std::cout << "Running assertRenderer" << std::endl;
+    Cube cube(Vector3(200, 300, 400), Vector3(10, 10, 10), Vector3(20, 20, 20), 300, 300, 300);
+    RenderingProperties renderingProperties;
+    Renderer renderer(renderingProperties);
+    std::vector<Edge> edges = renderer.render(cube);
+    std::cout << "  1/1\tRunning assertRenderer" << std::endl;
+    assert(edges.size() == 12);
+}
+
 int main() {
     assertVector3();
     assertShape3D();
@@ -243,6 +256,8 @@ int main() {
     assertCube();
     assertPiramid();
     assertCilinder();
+
+    assertRenderer();
     std::cout << "All tests passed!" << std::endl;
     return 0;
 }

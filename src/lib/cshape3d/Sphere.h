@@ -147,4 +147,8 @@ class Sphere: public Shape3D {
 
         //     return edges;
         // }
+
+        Shape3D* clone() {
+            return new Sphere(getOrigin(), getRotation(), getTranslation(), getVerticeCount(), getWidth(), getHeight(), getDepth());
+        }
 };

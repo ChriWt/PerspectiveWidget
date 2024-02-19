@@ -52,4 +52,8 @@ class Piramid: public Shape3D {
             return edges;
         }
 
+        Shape3D* clone() {
+            return new Piramid(getOrigin(), getRotation(), getTranslation(), getVerticeCount(), getWidth(), getHeight(), getDepth());
+        }
+
 };

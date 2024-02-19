@@ -51,4 +51,8 @@ class Cilinder: public Shape3D {
             }
             return edges;
         }
+
+        Shape3D* clone() {
+            return new Cilinder(getOrigin(), getRotation(), getTranslation(), getVerticeCount(), getWidth(), getHeight(), getDepth());
+        }
 };

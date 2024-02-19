@@ -15,7 +15,7 @@ namespace py = pybind11;
 PYBIND11_MODULE(CShape3D, m){
     m.doc() = "3D shape manipulation module";
 
-    py::class_<Vector2>(m, "Vector4")
+    py::class_<Vector2>(m, "Vector2")
         .def(py::init<>())
         .def(py::init<float, float>())
         .def("__add__", &Vector2::operator+)

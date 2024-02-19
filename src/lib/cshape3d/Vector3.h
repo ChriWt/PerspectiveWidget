@@ -40,6 +40,10 @@ class Vector3 {
             if (this == &other) return true;
             return x == other.x && y == other.y && z == other.z;
         }
+
+        bool operator!=(const Vector3& other) {
+            return !(*this == other);
+        }
 };
 
 #endif
