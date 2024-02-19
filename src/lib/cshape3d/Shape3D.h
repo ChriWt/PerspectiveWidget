@@ -2,12 +2,10 @@
 #include <list>
 #include <vector>
 
-#if !defined(__VECTOR3_H__)
-#define __VECTOR3_H__
 #include "Vector3.h"
-#endif
 
-
+#ifndef __SHAPE3D_H__
+#define __SHAPE3D_H__
 
 class Shape3D {
 
@@ -100,3 +98,5 @@ class Shape3D {
             return std::vector<std::tuple<int, int>>();
         }
 };
+
+#endif

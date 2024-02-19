@@ -1,10 +1,14 @@
 #include <string>
 
+#ifndef __VECTOR3_H__
+#define __VECTOR3_H__
 
 class Vector3 {
 
     public:
         float x, y, z;
+
+        Vector3() : x(0), y(0), z(0) {}
 
         Vector3(float x, float y, float z) {
             this->x = x;
@@ -37,3 +41,5 @@ class Vector3 {
             return x == other.x && y == other.y && z == other.z;
         }
 };
+
+#endif

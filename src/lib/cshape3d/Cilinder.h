@@ -1,19 +1,11 @@
+#include <cmath>
 
 #if !defined(M_2PI)
 #define M_2PI 6.283185307179586
 #endif
 
-#include <cmath>
-
-#if !defined(__VECTOR3_H__)
-#define __VECTOR3_H__
 #include "Vector3.h"
-#endif
-
-#if !defined(__SHAPE3D_H__)
-#define __SHAPE3D_H__
 #include "Shape3D.h"
-#endif
 
 
 class Cilinder: public Shape3D {

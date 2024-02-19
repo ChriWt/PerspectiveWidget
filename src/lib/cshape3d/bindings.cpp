@@ -6,12 +6,29 @@
 #include "Piramid.h"
 #include "Cilinder.h"
 
+#include "Renderer.h"
+#include "RenderingProperties.h"
+
+
 namespace py = pybind11;
 
 PYBIND11_MODULE(CShape3D, m){
     m.doc() = "3D shape manipulation module";
 
+    py::class_<Vector2>(m, "Vector4")
+        .def(py::init<>())
+        .def(py::init<float, float>())
+        .def("__add__", &Vector2::operator+)
+        .def("__sub__", &Vector2::operator-)
+        .def("__mul__", &Vector2::operator*, py::is_operator())
+        .def("__truediv__", &Vector2::operator/, py::is_operator())
+        .def("__repr__", &Vector2::toString)
+        .def("__eq__", &Vector2::operator==)
+        .def_readwrite("x", &Vector2::x)
+        .def_readwrite("y", &Vector2::y);
+
     py::class_<Vector3>(m, "Vector3")
+        .def(py::init<>())
         .def(py::init<float, float, float>())
         .def("__add__", &Vector3::operator+)
         .def("__sub__", &Vector3::operator-)
@@ -23,6 +40,26 @@ PYBIND11_MODULE(CShape3D, m){
         .def_readwrite("y", &Vector3::y)
         .def_readwrite("z", &Vector3::z);
 
+    py::class_<Vector4>(m, "Vector4")
+        .def(py::init<>())
+        .def(py::init<float, float, float, float>())
+        .def("__add__", &Vector4::operator+)
+        .def("__sub__", &Vector4::operator-)
+        .def("__mul__", &Vector4::operator*, py::is_operator())
+        .def("__truediv__", &Vector4::operator/, py::is_operator())
+        .def("__repr__", &Vector4::toString)
+        .def("__eq__", &Vector4::operator==)
+        .def_readwrite("x", &Vector4::x)
+        .def_readwrite("y", &Vector4::y)
+        .def_readwrite("z", &Vector4::z)
+        .def_readwrite("w", &Vector4::w);
+
+    py::class_<Edge>(m, "Edge")
+        .def(py::init<>())
+        .def(py::init<Vector2, Vector2>())
+        .def("__eq__", &Edge::operator==)
+        .def_readwrite("start", &Edge::start)
+        .def_readwrite("end", &Edge::end);
 
     py::class_<Shape3D>(m, "Shape3D")
         .def(py::init<>())
@@ -76,4 +113,33 @@ PYBIND11_MODULE(CShape3D, m){
         .def(py::init<Vector3, int, int>())
         .def("get_vertices", &Piramid::getVertices)
         .def("get_edges", &Piramid::getEdges);
+
+    py::class_<RenderingProperties>(m, "RenderingProperties")
+        .def(py::init<>())
+        .def(py::init<int, int, int, float, float, float, float>())
+        .def("get_fov", &RenderingProperties::getFov)
+        .def("get_offset_x", &RenderingProperties::getOffsetX)
+        .def("get_offset_y", &RenderingProperties::getOffsetY)
+        .def("get_scale", &RenderingProperties::getScale)
+        .def("get_aspect_ratio", &RenderingProperties::getAspectRatio)
+        .def("get_near", &RenderingProperties::getNear)
+        .def("get_far", &RenderingProperties::getFar)
+        .def("set_fov", &RenderingProperties::setFov)
+        .def("set_offset_x", &RenderingProperties::setOffsetX)
+        .def("set_offset_y", &RenderingProperties::setOffsetY)
+        .def("set_scale", &RenderingProperties::setScale)
+        .def("set_aspect_ratio", &RenderingProperties::setAspectRatio)
+        .def("set_near", &RenderingProperties::setNear)
+        .def("set_far", &RenderingProperties::setFar)
+        .def("set_rendering_properties", &RenderingProperties::setRenderingProperties)
+        .def("set_rendering_properties_from_existing", &RenderingProperties::setRenderingPropertiesFromExisting)
+        .def("__eq__", &RenderingProperties::operator==);
+
+    py::class_<Renderer>(m, "Renderer")
+        .def(py::init<>())
+        .def(py::init<RenderingProperties>())
+        .def("render", &Renderer::render)
+        .def("set_rendering_properties", &Renderer::setRenderingProperties)
+        .def("set_rendering_properties_and_render", &Renderer::setRenderingPropertiesAndRender);
+
 }
