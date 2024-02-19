@@ -453,6 +453,16 @@ class Canvas3DRenderer(CTkFrame):
         rotation = shape.get_rotation()
         origin = shape.get_origin()
 
+        if isinstance(shape, Cube):
+            self._shape_vertices_option_frame.pack_forget()
+        else:
+            self._shape_vertices_option_frame.pack(side="left" if self._orientation == self.HORIZONTAL else "top")
+
+        if isinstance(shape, Sphere):
+            self._shape_vertices_slider.configure(from_=4, to=30)
+        else:
+            self._shape_vertices_slider.configure(from_=self.SHAPE_VERTICES_SLIDER_RANGE[0], to=self.SHAPE_VERTICES_SLIDER_RANGE[1])
+
         self._shape_width.set(width)
         self._shape_height.set(height)
         self._shape_depth.set(depth)
@@ -463,16 +473,6 @@ class Canvas3DRenderer(CTkFrame):
         self._rotation_x.set(rotation.x)
         self._rotation_y.set(rotation.y)
         self._rotation_z.set(rotation.z)
-
-        if isinstance(shape, Cube):
-            self._shape_vertices_option_frame.pack_forget()
-        else:
-            self._shape_vertices_option_frame.pack(side="left" if self._orientation == self.HORIZONTAL else "top")
-
-        if isinstance(shape, Sphere):
-            self._shape_vertices_slider.configure(from_=4, to=30)
-        else:
-            self._shape_vertices_slider.configure(from_=self.SHAPE_VERTICES_SLIDER_RANGE[0], to=self.SHAPE_VERTICES_SLIDER_RANGE[1])
 
         self.__update_labels()        
         self._renderer.render(shape)
