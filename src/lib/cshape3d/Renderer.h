@@ -189,15 +189,10 @@ class Renderer {
             return degree * (M_PI / 180);
         }
 
-        void resetRotationMatrixIfNeeded(Shape3D& shape) {
-            if (this->shape != nullptr && this->shape.get()->getRotation() != shape.getRotation()) {
-                Vector3 newRotation = shape.getRotation();
-                Vector3 oldRotation = this->shape.get()->getRotation();
-
-                rotationMatrixXInitialized = newRotation.x != oldRotation.x;
-                rotationMatrixYInitialized = newRotation.y != oldRotation.y;
-                rotationMatrixZInitialized = newRotation.z != oldRotation.z;
-            }
+        void resetRotationMatrix() {
+            rotationMatrixXInitialized = false;
+            rotationMatrixYInitialized = false;
+            rotationMatrixZInitialized = false;
         }
 
     public:
@@ -211,7 +206,7 @@ class Renderer {
         }
 
         std::vector<Edge> render(Shape3D& shape) {
-            resetRotationMatrixIfNeeded(shape);
+            resetRotationMatrix();
             this->shape = std::unique_ptr<Shape3D>(shape.clone());
             
             return startRendering();
@@ -224,6 +219,7 @@ class Renderer {
 
         std::vector<Edge> setRenderingPropertiesAndRender(RenderingProperties renderingProperties) {
             setRenderingProperties(renderingProperties);
+            resetRotationMatrix();
             return startRendering();
         }
 };

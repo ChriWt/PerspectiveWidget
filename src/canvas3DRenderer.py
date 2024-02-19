@@ -1,8 +1,7 @@
 from customtkinter import CTkFrame, CTkCanvas, IntVar, DoubleVar, CTkSlider, CTkLabel, CTkButton
 from random import randint
 
-from CShape3D import RenderingProperties, Cube, Sphere, Piramid, Cilinder, Vector3, Shape3D
-from src.rendering.shapeRenderer import ShapeRenderer
+from CShape3D import RenderingProperties, Cube, Sphere, Piramid, Cilinder, Vector3, Shape3D, Renderer
 
     
 class Canvas3DRenderer(CTkFrame):
@@ -48,6 +47,7 @@ class Canvas3DRenderer(CTkFrame):
     # UI Constants
     CANVAS_BACKGROUND_COLOR = "black"
     HORIZONTAL_LINE_COLOR = "white"
+    EDGES_COLOR = "white"
     FOCAL_POINT_COLOR = "red"
     FOCAL_POINT_SIZE_OFFSETS = (-3, 3)  # Used for drawing the oval representing the focal point
 
@@ -406,7 +406,7 @@ class Canvas3DRenderer(CTkFrame):
         self.bind("<Configure>", self.__on_size_change)
 
     def __init_renderer(self) -> None:
-        self._renderer = ShapeRenderer(self._canvas, self._renderer_properties)
+        self._renderer = Renderer(self._renderer_properties)
 
     def __on_size_change(self, event) -> None:
         if event.width == self._width and event.height == self._height:
@@ -483,4 +483,13 @@ class Canvas3DRenderer(CTkFrame):
         self._canvas.delete("all")
         self.__display_focal_point()
         self.__display_horizontal_line()
-        self._renderer.render(self._shape)
+        self.__start_rendering()
+
+    def __start_rendering(self) -> None:
+        if self._shape is None: 
+            return
+        
+        edges = self._renderer.render(self._shape)
+
+        for edge in edges:
+            self._canvas.create_line(edge.start.x, edge.start.y, edge.end.x, edge.end.y, fill=self.EDGES_COLOR, width=1)
