@@ -1,18 +1,8 @@
+import time
 from customtkinter import CTkFrame, CTkCanvas, IntVar, DoubleVar, CTkSlider, CTkLabel, CTkButton
 from random import randint
 
-from src.rendering.rendererProperties import RendererProperties
-from src.rendering.shapeRenderer import ShapeRenderer
-from src.shape.cilinder import Cilinder
-from src.shape.piramid import Piramid
-from src.utils.vector3 import Vector3
-from src.shape.sphere import Sphere
-from src.shape.shape import Shape
-from src.shape.cube import Cube
-
-# import sys
-# sys.path.append(r'./release/Release')
-# import CShape3D
+from CShape3D import RenderingProperties, Cube, Sphere, Piramid, Cilinder, Vector3, Shape3D, Renderer
 
     
 class Canvas3DRenderer(CTkFrame):
@@ -50,7 +40,7 @@ class Canvas3DRenderer(CTkFrame):
     TRANSLATION_SLIDER_RANGE = (-1500, 1500)  # for X and Y, Z is (0, 1000)
     TRANSLATION_Z_SLIDER_RANGE = (0, 10000)
     SHAPE_DIMENSION_SLIDER_RANGE = (1, 1000)  # for width, height, depth
-    SHAPE_VERTICES_SLIDER_RANGE = (4, 30)
+    SHAPE_VERTICES_SLIDER_RANGE = (4, 1000)
 
     # Mouse Interaction Constants
     TRANSLATION_Z_INCREMENT = 10  # value for translation Z on mouse wheel event
@@ -58,6 +48,7 @@ class Canvas3DRenderer(CTkFrame):
     # UI Constants
     CANVAS_BACKGROUND_COLOR = "black"
     HORIZONTAL_LINE_COLOR = "white"
+    EDGES_COLOR = "white"
     FOCAL_POINT_COLOR = "red"
     FOCAL_POINT_SIZE_OFFSETS = (-3, 3)  # Used for drawing the oval representing the focal point
 
@@ -114,11 +105,12 @@ class Canvas3DRenderer(CTkFrame):
         self._shape_vertices = IntVar(value=0)
 
     def __init_renderer_properties(self) -> None:
-        self._renderer_properties = RendererProperties(
-            fov=self._fov.get(), 
-            aspect_ratio=self._aspect_ratio.get(),
-            offset_x=self._offset_x.get(),
-            offset_y=self._offset_y.get())
+        self._renderer_properties = RenderingProperties()
+        self._renderer_properties.set_fov(self._fov.get())
+        self._renderer_properties.set_scale(self._scale.get())
+        self._renderer_properties.set_offset_x(self._offset_x.get())
+        self._renderer_properties.set_offset_y(self._offset_y.get())
+        self._renderer_properties.set_aspect_ratio(self._aspect_ratio.get())
 
     def __init_UI(self):
         self._canvas = CTkCanvas(master=self, bg=self.CANVAS_BACKGROUND_COLOR, borderwidth=0, highlightthickness=0)
@@ -280,29 +272,35 @@ class Canvas3DRenderer(CTkFrame):
         self._shape_vertices_option_frame = CTkFrame(master=self._shape_options_frame)
         self._shape_vertices_label = CTkLabel(master=self._shape_vertices_option_frame, text=f"Shape Vertices ({self._shape_vertices.get()})")
         self._shape_vertices_label.pack(side="top")
-        CTkSlider(master=self._shape_vertices_option_frame, variable=self._shape_vertices, from_=self.SHAPE_VERTICES_SLIDER_RANGE[0], to=self.SHAPE_VERTICES_SLIDER_RANGE[1], orientation=self.HORIZONTAL, command=self.__update_labels).pack(side="top")
+        self._shape_vertices_slider = CTkSlider(master=self._shape_vertices_option_frame, variable=self._shape_vertices, from_=self.SHAPE_VERTICES_SLIDER_RANGE[0], to=self.SHAPE_VERTICES_SLIDER_RANGE[1], orientation=self.HORIZONTAL, command=self.__update_labels)
+        self._shape_vertices_slider.pack(side="top")
         frame.pack(side="left" if self._orientation == self.HORIZONTAL else "top")
 
         CTkButton(master=self._option_frame, text="Randomize", command=self.__randomize_shape_properties).pack(side="bottom" if self._orientation == self.VERTICAL else "right", padx=10 if self._orientation == self.HORIZONTAL else 0, pady=20 if self._orientation == self.VERTICAL else 10)
 
     def display_cube(self) -> None:
-        self.__set_display_scale(2500)
-        self.add_shape(Cube(Vector3(0, 0, 2000), width=500, height=500, depth=500, rotation_x=32, rotation_y=335))
+        self.__set_display_scale(1100)
+        cube = Cube(Vector3(), Vector3(32, 335, 0), Vector3(0, 0, 1500), 500, 500, 500)
+        self.add_shape(cube)
 
     def display_sphere(self) -> None:
-        self.__set_display_scale(2500)
-        self.add_shape(Sphere(Vector3(0, 0, 2000), vertices_count=8, width=500, rotation_x=16, rotation_y=323))
+        self.__set_display_scale(900)
+        sphere = Sphere(Vector3(), Vector3(16, 323, 0), Vector3(0, 0, 1500), 8, 500, 500, 500)
+        self.add_shape(sphere)
 
     def display_piramid(self) -> None:
-        self.__set_display_scale(2500)
-        self.add_shape(Piramid(Vector3(0, 0, 2000), vertices_count=4, width=250, height=500, depth=250, rotation_x=160, rotation_y=330))
+        self.__set_display_scale(1500)
+        piramid = Piramid(Vector3(), Vector3(160, 330, 0), Vector3(0, 200, 1500), 6, 250, 500, 250)
+        self.add_shape(piramid)
 
     def display_cilinder(self) -> None:
-        self.__set_display_scale(2500)
-        self.add_shape(Cilinder(Vector3(0, 0, 2000), vertices_count=30, width=250, height=300, depth=250, rotation_x=160, rotation_y=330))
+        self.__set_display_scale(1500)
+        cilinder = Cilinder(Vector3(), Vector3(160, 330, 0), Vector3(0, 0, 1500), 30, 250, 300, 250)
+        self.add_shape(cilinder)
 
     def __set_display_scale(self, scale: int) -> None:
-        self._renderer_properties.update(scale=scale)
+        self._renderer_properties.set_scale(scale)
+        self._renderer.set_rendering_properties(self._renderer_properties)
         self._scale.set(scale)
         self.__update_labels()
 
@@ -332,43 +330,45 @@ class Canvas3DRenderer(CTkFrame):
         self._shape_vertices.trace_add("write", self.__update_shape_vertices)
 
     def __update_fov(self, *_) -> None:
-        self._renderer_properties.update(fov=self._fov.get())
-        self.__render()
+        self._renderer_properties.set_fov(self._fov.get())
+        self.__after_option_change()
             
     def __update_scale(self, *_) -> None:
-        self._renderer_properties.update(scale=self._scale.get())
-        self.__render()
+        self._renderer_properties.set_scale(self._scale.get())
+        self.__after_option_change()
 
     def __update_offset_x(self, *_) -> None:
-        self._renderer_properties.update(offset_x=self._offset_x.get())
-        self.__render()
+        self._renderer_properties.set_offset_x(self._offset_x.get())
+        self.__after_option_change()
 
     def __update_offset_y(self, *_) -> None:
-        self._renderer_properties.update(offset_y=self._offset_y.get())
-        self.__render()
+        self._renderer_properties.set_offset_y(self._offset_y.get())
+        self.__after_option_change()
 
     def __update_aspect_ratio(self, *_) -> None:
-        self._renderer_properties.update(aspect_ratio=self._aspect_ratio.get())
-        self.__render()
+        self._renderer_properties.set_aspect_ratio(self._aspect_ratio.get())
+        self.__after_option_change()
         
     def __update_shape_position(self, *_) -> None:
-        self._shape._velocity = Vector3(self._translation_x.get(), self._translation_y.get(), self._translation_z.get())
+        self._shape.set_translation(Vector3(self._translation_x.get(), self._translation_y.get(), self._translation_z.get()))
+        self.__after_option_change()
+
+    def __after_option_change(self, *_) -> None:
+        self._renderer.set_rendering_properties(self._renderer_properties)
         self.__render()
 
     def __update_shape_size(self, *_) -> None:
-        self._shape._width = self._shape_width.get()
-        self._shape._height = self._shape_height.get()
-        self._shape._depth = self._shape_depth.get()
+        self._shape.set_width(self._shape_width.get())
+        self._shape.set_height(self._shape_height.get())
+        self._shape.set_depth(self._shape_depth.get())
         self.__render()
 
     def __update_shape_vertices(self, *_) -> None:
-        self._shape._vertices_count = self._shape_vertices.get()
+        self._shape.set_vertice_count(self._shape_vertices.get())
         self.__render()
 
     def __update_shape_rotation(self, *_) -> None:
-        self._shape._rotation_x = self._rotation_x.get()
-        self._shape._rotation_y = self._rotation_y.get()
-        self._shape._rotation_z = self._rotation_z.get()
+        self._shape.set_rotation(Vector3(self._rotation_x.get(), self._rotation_y.get(), self._rotation_z.get()))
         self.__render()
     
     def __display_focal_point(self) -> None:
@@ -403,7 +403,7 @@ class Canvas3DRenderer(CTkFrame):
         self.bind("<Configure>", self.__on_size_change)
 
     def __init_renderer(self) -> None:
-        self._renderer = ShapeRenderer(self._canvas, self._renderer_properties)
+        self._renderer = Renderer(self._renderer_properties)
 
     def __on_size_change(self, event) -> None:
         if event.width == self._width and event.height == self._height:
@@ -442,31 +442,34 @@ class Canvas3DRenderer(CTkFrame):
         if self._show_shape_options:
             self._shape_options_frame.pack(**common_kwargs)
             
-    def add_shape(self, shape: Shape) -> None:
+    def add_shape(self, shape: Shape3D) -> None:
         self._shape = shape
 
         width, height, depth = shape.get_width(), shape.get_height(), shape.get_depth()
         vertices_count = shape.get_vertice_count()
-        rotation_x = shape.get_rotation_x()
-        rotation_y = shape.get_rotation_y()
-        rotation_z = shape.get_rotation_z()
-        origin = shape.get_origin()
-
-        self._shape_width.set(width)
-        self._shape_height.set(height)
-        self._shape_depth.set(depth)
-        self._translation_x.set(origin.x)
-        self._translation_y.set(origin.y)
-        self._translation_z.set(origin.z)
-        self._shape_vertices.set(vertices_count)
-        self._rotation_x.set(rotation_x)
-        self._rotation_y.set(rotation_y)
-        self._rotation_z.set(rotation_z)
+        rotation = shape.get_rotation()
+        translation = shape.get_translation()
 
         if isinstance(shape, Cube):
             self._shape_vertices_option_frame.pack_forget()
         else:
             self._shape_vertices_option_frame.pack(side="left" if self._orientation == self.HORIZONTAL else "top")
+
+        if isinstance(shape, Sphere):
+            self._shape_vertices_slider.configure(from_=4, to=150)
+        else:
+            self._shape_vertices_slider.configure(from_=self.SHAPE_VERTICES_SLIDER_RANGE[0], to=self.SHAPE_VERTICES_SLIDER_RANGE[1])
+
+        self._shape_width.set(width)
+        self._shape_height.set(height)
+        self._shape_depth.set(depth)
+        self._translation_x.set(translation.x)
+        self._translation_y.set(translation.y)
+        self._translation_z.set(translation.z)
+        self._shape_vertices.set(vertices_count)
+        self._rotation_x.set(rotation.x)
+        self._rotation_y.set(rotation.y)
+        self._rotation_z.set(rotation.z)
 
         self.__update_labels()        
         self._renderer.render(shape)
@@ -477,4 +480,10 @@ class Canvas3DRenderer(CTkFrame):
         self._canvas.delete("all")
         self.__display_focal_point()
         self.__display_horizontal_line()
-        self._renderer.render(self._shape)
+        self.__start_rendering()
+
+    def __start_rendering(self) -> None:
+        if self._shape is None: 
+            return
+        edges = self._renderer.render(self._shape)
+        self._canvas.create_line(*edges, fill=self.EDGES_COLOR, width=1)

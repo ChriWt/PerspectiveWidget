@@ -1,8 +1,8 @@
 __pycache__
 
 .vscode
-
-src/lib/test.exe
+.venv
 
 build/*
 release/*
+src/lib/cshape3d/*.exe

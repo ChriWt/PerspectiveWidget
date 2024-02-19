@@ -1,19 +1,11 @@
+#include <cmath>
 
 #if !defined(M_2PI)
 #define M_2PI 6.283185307179586
 #endif
 
-#include <cmath>
-
-#if !defined(__VECTOR3_H__)
-#define __VECTOR3_H__
-#include "Vector3.h"
-#endif
-
-#if !defined(__SHAPE3D_H__)
-#define __SHAPE3D_H__
-#include "Shape3D.h"
-#endif
+#include "../vector/Vector3.h"
+#include "../shape/Shape3D.h"
 
 
 class Cilinder: public Shape3D {
@@ -58,5 +50,9 @@ class Cilinder: public Shape3D {
                 edges.push_back(std::make_tuple(2 * i, 2 * i + 1));
             }
             return edges;
+        }
+
+        Shape3D* clone() {
+            return new Cilinder(getOrigin(), getRotation(), getTranslation(), getVerticeCount(), getWidth(), getHeight(), getDepth());
         }
 };

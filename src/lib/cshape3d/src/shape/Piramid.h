@@ -1,11 +1,5 @@
-#if !defined(__VECTOR3_H__)
-#define __VECTOR3_H__
-#include "Vector3.h"
-#endif
-
-#if !defined(__SHAPE3D_H__)
-#define __SHAPE3D_H__
-#include "Shape3D.h"
+#ifndef M_PI
+#define M_PI 3.14159265359
 #endif
 
 class Piramid: public Shape3D {
@@ -56,6 +50,10 @@ class Piramid: public Shape3D {
             edges.push_back(std::make_tuple(1, verticeCount));
 
             return edges;
+        }
+
+        Shape3D* clone() {
+            return new Piramid(getOrigin(), getRotation(), getTranslation(), getVerticeCount(), getWidth(), getHeight(), getDepth());
         }
 
 };

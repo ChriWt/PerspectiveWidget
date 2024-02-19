@@ -2,12 +2,10 @@
 #include <list>
 #include <vector>
 
-#if !defined(__VECTOR3_H__)
-#define __VECTOR3_H__
-#include "Vector3.h"
-#endif
+#include "../vector/Vector3.h"
 
-
+#ifndef __SHAPE3D_H__
+#define __SHAPE3D_H__
 
 class Shape3D {
 
@@ -99,4 +97,10 @@ class Shape3D {
         virtual std::vector<std::tuple<int, int>> getEdges() {
             return std::vector<std::tuple<int, int>>();
         }
+
+        virtual Shape3D* clone() {
+            return new Shape3D(origin, rotation, translation, verticeCount, width, height, depth);
+        }
 };
+
+#endif

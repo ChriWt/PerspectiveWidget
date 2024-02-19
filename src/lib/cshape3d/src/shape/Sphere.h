@@ -1,19 +1,12 @@
 #include <cmath>
 #include <numeric>
 
-#if !defined(M_PI)
+#ifndef M_PI
 #define M_PI 3.14159265359
 #endif
 
-#if !defined(__VECTOR3_H__)
-#define __VECTOR3_H__
-#include "Vector3.h"
-#endif
-
-#if !defined(__SHAPE3D_H__)
-#define __SHAPE3D_H__
-#include "Shape3D.h"
-#endif
+#include "../vector/Vector3.h"
+#include "../shape/Shape3D.h"
 
 
 class Sphere: public Shape3D {
@@ -154,4 +147,8 @@ class Sphere: public Shape3D {
 
         //     return edges;
         // }
+
+        Shape3D* clone() {
+            return new Sphere(getOrigin(), getRotation(), getTranslation(), getVerticeCount(), getWidth(), getHeight(), getDepth());
+        }
 };

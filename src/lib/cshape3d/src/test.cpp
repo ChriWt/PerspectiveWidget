@@ -1,20 +1,13 @@
 #include <iostream>
 #include <cassert>
 
-#if !defined(__VECTOR3_H__)
-#define __VECTOR3_H__
-#include "Vector3.h"
-#endif
-
-#if !defined(__SHAPE3D_H__)
-#define __SHAPE3D_H__
-#include "Shape3D.h"
-#endif
-
 #include "Sphere.h"
 #include "Cube.h"
 #include "Piramid.h"
 #include "Cilinder.h"
+
+#include "Renderer.h"
+#include "RenderingProperties.h"
 
 
 void assertVector3Equals() {
@@ -245,6 +238,16 @@ void assertCilinder() {
     assertCiliinderEdgesCount();
 }
 
+void assertRenderer() {
+    std::cout << "Running assertRenderer" << std::endl;
+    Cube cube(Vector3(200, 300, 400), Vector3(10, 10, 10), Vector3(20, 20, 20), 300, 300, 300);
+    RenderingProperties renderingProperties;
+    Renderer renderer(renderingProperties);
+    std::vector<Edge> edges = renderer.render(cube);
+    std::cout << "  1/1\tRunning assertRenderer" << std::endl;
+    assert(edges.size() == 12);
+}
+
 int main() {
     assertVector3();
     assertShape3D();
@@ -253,6 +256,8 @@ int main() {
     assertCube();
     assertPiramid();
     assertCilinder();
+
+    assertRenderer();
     std::cout << "All tests passed!" << std::endl;
     return 0;
 }

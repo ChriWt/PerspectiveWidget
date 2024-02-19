@@ -1,12 +1,6 @@
-#if !defined(__VECTOR3_H__)
-#define __VECTOR3_H__
-#include "Vector3.h"
-#endif
+#include "../vector/Vector3.h"
+#include "../shape/Shape3D.h"
 
-#if !defined(__SHAPE3D_H__)
-#define __SHAPE3D_H__
-#include "Shape3D.h"
-#endif
 
 class Cube: public Shape3D {
 
@@ -59,14 +53,28 @@ class Cube: public Shape3D {
                 std::make_tuple(1, 3),
                 std::make_tuple(3, 2),
                 std::make_tuple(2, 0),
-                std::make_tuple(4, 5),
-                std::make_tuple(5, 6),
-                std::make_tuple(6, 7),
-                std::make_tuple(7, 4),
+
                 std::make_tuple(0, 6),
-                std::make_tuple(1, 5),
+                std::make_tuple(6, 7),
+                std::make_tuple(7, 2),
                 std::make_tuple(2, 7),
-                std::make_tuple(3, 4)
+                
+                std::make_tuple(7, 4),
+                std::make_tuple(4, 3),
+                std::make_tuple(3, 4),
+                std::make_tuple(4, 7),
+
+                std::make_tuple(7, 4),
+                std::make_tuple(4, 5),
+                std::make_tuple(5, 1),
+                std::make_tuple(1, 5),
+
+                std::make_tuple(5, 4),
+                std::make_tuple(5, 6),
             };
+        }
+
+        Shape3D* clone() {
+            return new Cube(getOrigin(), getRotation(), getTranslation(), getWidth(), getHeight(), getDepth());
         }
 };
