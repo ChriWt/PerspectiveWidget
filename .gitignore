@@ -2,7 +2,7 @@ __pycache__
 
 .vscode
 
-src/lib/cshape3d/test.exe
 
 build/*
 release/*
+src/lib/cshape3d/*.exe
