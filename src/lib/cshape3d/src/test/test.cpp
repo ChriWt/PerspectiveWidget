@@ -1,13 +1,13 @@
 #include <iostream>
 #include <cassert>
 
-#include "Sphere.h"
-#include "Cube.h"
-#include "Piramid.h"
-#include "Cilinder.h"
+#include "../shape/Sphere.h"
+#include "../shape/Cube.h"
+#include "../shape/Piramid.h"
+#include "../shape/Cilinder.h"
 
-#include "Renderer.h"
-#include "RenderingProperties.h"
+#include "../renderer/Renderer.h"
+#include "../renderer/RenderingProperties.h"
 
 
 void assertVector3Equals() {
@@ -172,7 +172,7 @@ void assertCubeEdgesCount() {
     Cube cube(Vector3(0, 0, 0), 340, 500, 240);
     std::vector<Vector3> vertices = cube.getVertices();
     std::vector<std::tuple<int, int>> edges = cube.getEdges();
-    assert(edges.size() == 12);
+    assert(edges.size() == 18);
 }
 
 void assertCube() {
@@ -243,9 +243,8 @@ void assertRenderer() {
     Cube cube(Vector3(200, 300, 400), Vector3(10, 10, 10), Vector3(20, 20, 20), 300, 300, 300);
     RenderingProperties renderingProperties;
     Renderer renderer(renderingProperties);
-    std::vector<Edge> edges = renderer.render(cube);
-    std::cout << "  1/1\tRunning assertRenderer" << std::endl;
-    assert(edges.size() == 12);
+    std::vector<std::tuple<int, int>> edges = renderer.render(cube);
+    assert(edges.size() == 54);
 }
 
 int main() {

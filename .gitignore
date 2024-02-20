@@ -5,4 +5,4 @@ __pycache__
 
 build/*
 release/*
-src/lib/cshape3d/*.exe
+src/lib/cshape3d/src/test/*.exe
