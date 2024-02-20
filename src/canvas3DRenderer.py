@@ -1,7 +1,7 @@
 from customtkinter import CTkFrame, CTkCanvas, IntVar, DoubleVar, CTkSlider, CTkLabel, CTkButton
 from random import randint
 
-from CShape3D import RenderingProperties, Cube, Sphere, Piramid, Cilinder, Vector3, Shape3D, Renderer
+from CShape3D import RenderingProperties, Cube, Sphere, Piramid, Cilinder, Vector3, Object3D, Renderer, OBJParser, CustomObject3D
 
     
 class Canvas3DRenderer(CTkFrame):
@@ -297,6 +297,16 @@ class Canvas3DRenderer(CTkFrame):
         cilinder = Cilinder(Vector3(), Vector3(160, 330, 0), Vector3(0, 0, 1500), 30, 250, 300, 250)
         self.add_shape(cilinder)
 
+    def display_object(self, path: str) -> None:
+        self.__set_display_scale(1500)
+        obj = OBJParser().parse(path)
+        obj.set_translation(Vector3(0, 10, 50))
+        obj.set_width(500)
+        obj.set_height(500)
+        obj.set_depth(500)
+        obj.set_rotation(Vector3(0, 290, 0))
+        self.add_shape(obj)
+
     def __set_display_scale(self, scale: int) -> None:
         self._renderer_properties.set_scale(scale)
         self._renderer.set_rendering_properties(self._renderer_properties)
@@ -441,7 +451,7 @@ class Canvas3DRenderer(CTkFrame):
         if self._show_shape_options:
             self._shape_options_frame.pack(**common_kwargs)
             
-    def add_shape(self, shape: Shape3D) -> None:
+    def add_shape(self, shape: Object3D) -> None:
         self._shape = shape
 
         width, height, depth = shape.get_width(), shape.get_height(), shape.get_depth()
@@ -484,5 +494,6 @@ class Canvas3DRenderer(CTkFrame):
     def __start_rendering(self) -> None:
         if self._shape is None: 
             return
+        
         edges = self._renderer.render(self._shape)
         self._canvas.create_line(*edges, fill=self.EDGES_COLOR, width=1)

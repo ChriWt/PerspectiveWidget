@@ -5,7 +5,8 @@
 
 #include "../vector/Vector3.h"
 #include "../vector/Vector4.h"
-#include "../shape/Shape3D.h"
+#include "../shape/Object3D.h"
+#include "../object/CustomObject3D.h"
 #include "RenderingProperties.h"
 
 #ifndef M_PI
@@ -19,7 +20,7 @@ class Renderer {
 
     private:
 
-        std::unique_ptr<Shape3D> shape;
+        std::unique_ptr<Object3D> shape;
         RenderingProperties renderingProperties;
 
         Matrix4x4 rotationMatrixX;
@@ -47,6 +48,29 @@ class Renderer {
                 edges.push_back(std::make_tuple(startVertex.x, startVertex.y));
                 edges.push_back(std::make_tuple(endVertex.x, endVertex.y));
                 edges.push_back(std::make_tuple(startVertex.x, startVertex.y));
+            }
+
+            return edges;
+        }
+
+        std::vector<std::tuple<int, int>> startCustomObjectRendering() {
+            std::vector<std::tuple<int, int>> edges;
+            std::vector<Vector3> vertices = this->projectedVertices();
+
+            std::vector<std::vector<int>> faces = shape.get()->getFaces();
+            
+            for (auto face : faces) {
+                for (int i = 0; i < face.size(); i++) {
+                    int start = face[i];
+                    int end = face[(i + 1) % face.size()];
+
+                    Vector3 startVertex = vertices[start];
+                    Vector3 endVertex = vertices[end];
+
+                    edges.push_back(std::make_tuple(startVertex.x, startVertex.y));
+                    edges.push_back(std::make_tuple(endVertex.x, endVertex.y));
+                    // edges.push_back(std::make_tuple(startVertex.x, startVertex.y));
+                }
             }
 
             return edges;
@@ -205,9 +229,15 @@ class Renderer {
             this->buildProjectionMatrix();
         }
 
-        std::vector<std::tuple<int, int>> render(Shape3D& shape) {
+        std::vector<std::tuple<int, int>> render(Object3D& shape) {
             resetRotationMatrix();
-            this->shape = std::unique_ptr<Shape3D>(shape.clone());
+            this->shape = std::unique_ptr<Object3D>(shape.clone());
+            
+            CustomObject3D* customObject3D = dynamic_cast<CustomObject3D*>(this->shape.get());
+            if (customObject3D != nullptr) {
+                return startCustomObjectRendering();
+            }
+
             return startRendering();
         }
 
@@ -219,6 +249,12 @@ class Renderer {
         std::vector<std::tuple<int, int>> setRenderingPropertiesAndRender(RenderingProperties renderingProperties) {
             setRenderingProperties(renderingProperties);
             resetRotationMatrix();
+
+            CustomObject3D* customObject3D = dynamic_cast<CustomObject3D*>(shape.get());
+            if (customObject3D != nullptr) {
+                return startCustomObjectRendering();
+            }
+
             return startRendering();
         }
 };

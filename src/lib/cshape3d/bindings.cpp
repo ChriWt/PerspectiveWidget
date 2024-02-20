@@ -9,6 +9,8 @@
 #include "src/renderer/Renderer.h"
 #include "src/renderer/RenderingProperties.h"
 
+#include "src/object/OBJParser.h"
+
 
 namespace py = pybind11;
 
@@ -42,28 +44,28 @@ PYBIND11_MODULE(CShape3D, m){
         .def_readwrite("z", &Vector4::z)
         .def_readwrite("w", &Vector4::w);
 
-    py::class_<Shape3D>(m, "Shape3D")
+    py::class_<Object3D>(m, "Object3D")
         .def(py::init<>())
         .def(py::init<Vector3, Vector3, Vector3, int, int, int, int>())
-        .def("get_origin", &Shape3D::getOrigin)
-        .def("get_rotation", &Shape3D::getRotation)
-        .def("get_translation", &Shape3D::getTranslation)
-        .def("get_vertice_count", &Shape3D::getVerticeCount)
-        .def("get_width", &Shape3D::getWidth)
-        .def("get_height", &Shape3D::getHeight)
-        .def("get_depth", &Shape3D::getDepth)
-        .def("set_origin", &Shape3D::setOrigin)
-        .def("set_rotation", &Shape3D::setRotation)
-        .def("set_translation", &Shape3D::setTranslation)
-        .def("set_vertice_count", &Shape3D::setVerticeCount)
-        .def("set_width", &Shape3D::setWidth)
-        .def("set_height", &Shape3D::setHeight)
-        .def("set_depth", &Shape3D::setDepth)
-        .def("to_string", &Shape3D::toString)
-        .def("get_vertices", &Shape3D::getVertices)
-        .def("get_edges", &Shape3D::getEdges);
+        .def("get_origin", &Object3D::getOrigin)
+        .def("get_rotation", &Object3D::getRotation)
+        .def("get_translation", &Object3D::getTranslation)
+        .def("get_vertice_count", &Object3D::getVerticeCount)
+        .def("get_width", &Object3D::getWidth)
+        .def("get_height", &Object3D::getHeight)
+        .def("get_depth", &Object3D::getDepth)
+        .def("set_origin", &Object3D::setOrigin)
+        .def("set_rotation", &Object3D::setRotation)
+        .def("set_translation", &Object3D::setTranslation)
+        .def("set_vertice_count", &Object3D::setVerticeCount)
+        .def("set_width", &Object3D::setWidth)
+        .def("set_height", &Object3D::setHeight)
+        .def("set_depth", &Object3D::setDepth)
+        .def("to_string", &Object3D::toString)
+        .def("get_vertices", &Object3D::getVertices)
+        .def("get_edges", &Object3D::getEdges);
 
-    py::class_<Cilinder, Shape3D>(m, "Cilinder")
+    py::class_<Cilinder, Object3D>(m, "Cilinder")
         .def(py::init<>())
         .def(py::init<Vector3, Vector3, Vector3, int, int, int, int>())
         .def(py::init<Vector3, int, int, int, int>())
@@ -71,7 +73,7 @@ PYBIND11_MODULE(CShape3D, m){
         .def("get_vertices", &Cilinder::getVertices)
         .def("get_edges", &Cilinder::getEdges);
 
-    py::class_<Sphere, Shape3D>(m, "Sphere")
+    py::class_<Sphere, Object3D>(m, "Sphere")
         .def(py::init<>())
         .def(py::init<Vector3, Vector3, Vector3, int, int, int, int>())
         .def(py::init<Vector3, int, int, int, int>())
@@ -79,7 +81,7 @@ PYBIND11_MODULE(CShape3D, m){
         .def("get_vertices", &Sphere::getVertices)
         .def("get_edges", &Sphere::getEdges);
 
-    py::class_<Cube, Shape3D>(m, "Cube")
+    py::class_<Cube, Object3D>(m, "Cube")
         .def(py::init<>())
         .def(py::init<Vector3, Vector3, Vector3, int, int, int>())
         .def(py::init<Vector3, int, int, int>())
@@ -87,7 +89,7 @@ PYBIND11_MODULE(CShape3D, m){
         .def("get_vertices", &Cube::getVertices)
         .def("get_edges", &Cube::getEdges);
 
-    py::class_<Piramid, Shape3D>(m, "Piramid")
+    py::class_<Piramid, Object3D>(m, "Piramid")
         .def(py::init<>())
         .def(py::init<Vector3, Vector3, Vector3, int, int, int, int>())
         .def(py::init<Vector3, int, int, int, int>())
@@ -122,5 +124,14 @@ PYBIND11_MODULE(CShape3D, m){
         .def("render", &Renderer::render)
         .def("set_rendering_properties", &Renderer::setRenderingProperties)
         .def("set_rendering_properties_and_render", &Renderer::setRenderingPropertiesAndRender);
+
+    py::class_<CustomObject3D, Object3D>(m, "CustomObject3D")
+        .def(py::init<std::vector<Vector3>, std::vector<std::vector<int>>>())
+        .def("get_vertices", &CustomObject3D::getVertices)
+        .def("get_faces", &CustomObject3D::getFaces);
+
+    py::class_<OBJParser>(m, "OBJParser")
+        .def(py::init<>())
+        .def_static("parse", &OBJParser::parse);
 
 }

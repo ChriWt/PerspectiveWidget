@@ -6,8 +6,13 @@
 #include "../shape/Piramid.h"
 #include "../shape/Cilinder.h"
 
+#include "../shape/Object3D.h"
+
 #include "../renderer/Renderer.h"
 #include "../renderer/RenderingProperties.h"
+
+#include "../object/OBJParser.h"
+#include "../object/CustomObject3D.h"
 
 
 void assertVector3Equals() {
@@ -75,8 +80,8 @@ void assertVector3() {
     assertVector3Division();
 }
 
-void assertShape3DProperConstruction(std::string className, Shape3D shape) {
-    std::cout << "Running assertShape3DProperConstruction (" << className << ")" << std::endl;
+void assertObject3DProperConstruction(std::string className, Object3D shape) {
+    std::cout << "Running assertObject3DProperConstruction (" << className << ")" << std::endl;
     assert(shape.getOrigin() == Vector3(100, 100, 100));
     assert(shape.getRotation() == Vector3(45, 45, 45));
     assert(shape.getTranslation() == Vector3(200, 150, 300));
@@ -86,8 +91,8 @@ void assertShape3DProperConstruction(std::string className, Shape3D shape) {
     assert(shape.getDepth() == 240);
 }
 
-void assertShape3DSetters(std::string className, Shape3D shape) {
-    std::cout << "Running assertShape3DSetters (" << className << ")" << std::endl;
+void assertObject3DSetters(std::string className, Object3D shape) {
+    std::cout << "Running assertObject3DSetters (" << className << ")" << std::endl;
     shape.setOrigin(Vector3(200, 200, 200));
     shape.setRotation(Vector3(90, 90, 90));
     shape.setTranslation(Vector3(300, 250, 400));
@@ -104,34 +109,34 @@ void assertShape3DSetters(std::string className, Shape3D shape) {
     assert(shape.getDepth() == 480);
 }
 
-void assertShape3D() {
-    std::cout << "Running assertShape3D:" << std::endl;
+void assertObject3D() {
+    std::cout << "Running assertObject3D:" << std::endl;
     std::string tests = "10";
 
     std::cout << "  1/" + tests + "\t";
-    assertShape3DProperConstruction("Shape3d", Shape3D(Vector3(100, 100, 100), Vector3(45, 45, 45), Vector3(200, 150, 300), 8, 340, 500, 240));
+    assertObject3DProperConstruction("Object3D", Object3D(Vector3(100, 100, 100), Vector3(45, 45, 45), Vector3(200, 150, 300), 8, 340, 500, 240));
     std::cout << "  2/" + tests + "\t";
-    assertShape3DSetters("Shape3d", Shape3D());
+    assertObject3DSetters("Object3D", Object3D());
 
     std::cout << "  3/" + tests + "\t";
-    assertShape3DProperConstruction("Sphere", Sphere(Vector3(100, 100, 100), Vector3(45, 45, 45), Vector3(200, 150, 300), 8, 340, 500, 240));
+    assertObject3DProperConstruction("Sphere", Sphere(Vector3(100, 100, 100), Vector3(45, 45, 45), Vector3(200, 150, 300), 8, 340, 500, 240));
     std::cout << "  4/" + tests + "\t";
-    assertShape3DSetters("Sphere", Sphere());
+    assertObject3DSetters("Sphere", Sphere());
 
     std::cout << "  5/" + tests + "\t";
-    assertShape3DProperConstruction("Cube", Cube(Vector3(100, 100, 100), Vector3(45, 45, 45), Vector3(200, 150, 300), 340, 500, 240));
+    assertObject3DProperConstruction("Cube", Cube(Vector3(100, 100, 100), Vector3(45, 45, 45), Vector3(200, 150, 300), 340, 500, 240));
     std::cout << "  6/" + tests + "\t";
-    assertShape3DSetters("Cube", Cube());
+    assertObject3DSetters("Cube", Cube());
 
     std::cout << "  7/" + tests + "\t";
-    assertShape3DProperConstruction("Piramid", Piramid(Vector3(100, 100, 100), Vector3(45, 45, 45), Vector3(200, 150, 300), 8, 340, 500, 240));
+    assertObject3DProperConstruction("Piramid", Piramid(Vector3(100, 100, 100), Vector3(45, 45, 45), Vector3(200, 150, 300), 8, 340, 500, 240));
     std::cout << "  8/" + tests + "\t";
-    assertShape3DSetters("Piramid", Piramid());
+    assertObject3DSetters("Piramid", Piramid());
 
     std::cout << "  9/" + tests + "\t";
-    assertShape3DProperConstruction("Cilinder", Cilinder(Vector3(100, 100, 100), Vector3(45, 45, 45), Vector3(200, 150, 300), 8, 340, 500, 240));
+    assertObject3DProperConstruction("Cilinder", Cilinder(Vector3(100, 100, 100), Vector3(45, 45, 45), Vector3(200, 150, 300), 8, 340, 500, 240));
     std::cout << " 10/" + tests + "\t";
-    assertShape3DSetters("Cilinder", Cilinder());
+    assertObject3DSetters("Cilinder", Cilinder());
 }
 
 void assertSphereVerticesCount() {
@@ -247,9 +252,16 @@ void assertRenderer() {
     assert(edges.size() == 54);
 }
 
+void assertParsing() {
+    std::cout << "Running assertParsing" << std::endl;
+    CustomObject3D object = OBJParser::parse("C:\\Users\\xXDar\\OneDrive\\Desktop\\Sting-Sword-lowpoly.obj");
+    assert(object.getVertices().size() > 0);
+    assert(object.getFaces().size() > 0);
+}
+
 int main() {
     assertVector3();
-    assertShape3D();
+    assertObject3D();
 
     assertSphere();
     assertCube();
@@ -257,6 +269,8 @@ int main() {
     assertCilinder();
 
     assertRenderer();
+
+    assertParsing();
     std::cout << "All tests passed!" << std::endl;
     return 0;
 }

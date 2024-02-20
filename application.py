@@ -2,6 +2,7 @@ from customtkinter import CTk
 
 import sys
 sys.path.append(r'./src/lib/cshape3d/bin')
+# sys.path.append(r'./build/Release')
 
 from src.canvas3DRenderer import Canvas3DRenderer
 
@@ -29,6 +30,9 @@ class Main(CTk):
     def display_sphere(self) -> None:
         self.shape_visualizer.display_sphere()
 
+    def display_object(self, path: str) -> None:
+        self.shape_visualizer.display_object(path)
+
 
 if __name__ == "__main__":
     APP_WIDHT = 1200
@@ -40,7 +44,7 @@ if __name__ == "__main__":
     root.geometry(f"{APP_WIDHT}x{APP_HEIGHT}+{int(root.winfo_screenwidth()/2 - APP_WIDHT/2)}+{int(root.winfo_screenheight()/2 - APP_HEIGHT/2)}")
     root.after(0, lambda:root.state('zoomed'))
 
-    root.display_sphere()
+    root.display_object("./sword.obj")
     root.mainloop()
 
     

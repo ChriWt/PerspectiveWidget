@@ -1,8 +1,8 @@
 #include "../vector/Vector3.h"
-#include "../shape/Shape3D.h"
+#include "../shape/Object3D.h"
 
 
-class Cube: public Shape3D {
+class Cube: public Object3D {
 
     private:
 
@@ -20,16 +20,16 @@ class Cube: public Shape3D {
 
     public:
 
-        Cube() : Shape3D(Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), VERTICE_COUNT, 0, 0, 0) {}
+        Cube() : Object3D(Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), VERTICE_COUNT, 0, 0, 0) {}
 
         Cube(Vector3 origin, Vector3 rotation, Vector3 translation, int width, int height, int depth): 
-            Shape3D(origin, rotation, translation, VERTICE_COUNT, width, height, depth) {}
+            Object3D(origin, rotation, translation, VERTICE_COUNT, width, height, depth) {}
 
         Cube(Vector3 origin, int width, int height, int depth): 
-            Shape3D(origin, Vector3(0, 0, 0), Vector3(0, 0, 0), VERTICE_COUNT, width, height, depth) {}
+            Object3D(origin, Vector3(0, 0, 0), Vector3(0, 0, 0), VERTICE_COUNT, width, height, depth) {}
 
         Cube(Vector3 origin, int width): 
-            Shape3D(origin, Vector3(0, 0, 0), Vector3(0, 0, 0), VERTICE_COUNT, width, width, width) {}
+            Object3D(origin, Vector3(0, 0, 0), Vector3(0, 0, 0), VERTICE_COUNT, width, width, width) {}
 
         std::vector<Vector3> getVertices() {
             Vector3 nearLeftUp = calculateNearLeftUp();
@@ -74,7 +74,7 @@ class Cube: public Shape3D {
             };
         }
 
-        Shape3D* clone() {
+        Object3D* clone() {
             return new Cube(getOrigin(), getRotation(), getTranslation(), getWidth(), getHeight(), getDepth());
         }
 };

@@ -2,20 +2,23 @@
 #define M_PI 3.14159265359
 #endif
 
-class Piramid: public Shape3D {
+#include "../vector/Vector3.h"
+#include "../shape/Object3D.h"
+
+class Piramid: public Object3D {
 
     public:
 
-        Piramid() : Shape3D(Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), 0, 0, 0, 0) {}
+        Piramid() : Object3D(Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), 0, 0, 0, 0) {}
 
         Piramid(Vector3 origin, Vector3 rotation, Vector3 translation, int verticeCount, int width, int height, int depth): 
-            Shape3D(origin, rotation, translation, verticeCount, width, height, depth) {}
+            Object3D(origin, rotation, translation, verticeCount, width, height, depth) {}
 
         Piramid(Vector3 origin, int verticeCount, int width, int height, int depth):
-            Shape3D(origin, Vector3(0, 0, 0), Vector3(0, 0, 0), verticeCount, width, height, depth) {}
+            Object3D(origin, Vector3(0, 0, 0), Vector3(0, 0, 0), verticeCount, width, height, depth) {}
 
         Piramid(Vector3 origin, int verticeCount, int width):
-            Shape3D(origin, Vector3(0, 0, 0), Vector3(0, 0, 0), verticeCount, width, width, width) {}
+            Object3D(origin, Vector3(0, 0, 0), Vector3(0, 0, 0), verticeCount, width, width, width) {}
 
         std::vector<Vector3> getVertices() {
             std::vector<Vector3> vertices;
@@ -52,8 +55,7 @@ class Piramid: public Shape3D {
             return edges;
         }
 
-        Shape3D* clone() {
+        Object3D* clone() {
             return new Piramid(getOrigin(), getRotation(), getTranslation(), getVerticeCount(), getWidth(), getHeight(), getDepth());
         }
-
 };

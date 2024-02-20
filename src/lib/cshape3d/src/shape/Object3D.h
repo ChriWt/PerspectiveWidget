@@ -4,10 +4,10 @@
 
 #include "../vector/Vector3.h"
 
-#ifndef __SHAPE3D_H__
-#define __SHAPE3D_H__
+#ifndef __OBBJECT3D_H_
+#define __OBBJECT3D_H_
 
-class Shape3D {
+class Object3D {
 
     private:
         Vector3 origin;
@@ -19,9 +19,9 @@ class Shape3D {
         int depth;
 
     public: 
-        Shape3D() : Shape3D(Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), 0, 0, 0, 0) {}
+        Object3D() : Object3D(Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), 0, 0, 0, 0) {}
 
-        Shape3D(Vector3 origin, Vector3 rotation, Vector3 translation, int verticeCount, int width, int height, int depth): 
+        Object3D(Vector3 origin, Vector3 rotation, Vector3 translation, int verticeCount, int width, int height, int depth): 
             origin(origin), 
             rotation(rotation), 
             translation(translation),
@@ -98,8 +98,12 @@ class Shape3D {
             return std::vector<std::tuple<int, int>>();
         }
 
-        virtual Shape3D* clone() {
-            return new Shape3D(origin, rotation, translation, verticeCount, width, height, depth);
+        virtual std::vector<std::vector<int>> getFaces() {
+            return std::vector<std::vector<int>>();
+        }
+
+        virtual Object3D* clone() {
+            return new Object3D(origin, rotation, translation, verticeCount, width, height, depth);
         }
 };
 
