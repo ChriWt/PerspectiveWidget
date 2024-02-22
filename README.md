@@ -6,5 +6,5 @@ Adding the submodule:
 
 How to build:
   1) mkdir build && cd build
-  2) cmake -DCMAKE_BUILD_TYPE=Release ..
+  2) cmake -G "Visual Studio XX XXXX" -A x64 -DCMAKE_BUILD_TYPE=Release ..
   3) cmake --build . --config Release

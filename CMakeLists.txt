@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.4)
+cmake_minimum_required(VERSION 3.29)
 project(CShape3D)
 
 # Assuming pybind11 is added as a submodule in extern/pybind11
