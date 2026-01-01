@@ -1,0 +1,16 @@
+[build-system]
+requires = ["scikit-build-core>=0.9", "pybind11"]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "cshape3d"
+version = "0.1.0"
+requires-python = ">=3.10"
+description = "3D shape manipulation module (pybind11)"
+readme = "README.md"
+
+[tool.scikit-build]
+# dice a scikit-build dove trovare il package python
+wheel.packages = ["src/cshape3d"]
+# opzionale: build più pulita
+build-dir = "build/{wheel_tag}"

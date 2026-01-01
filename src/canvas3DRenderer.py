@@ -1,9 +1,12 @@
 from customtkinter import CTkFrame, CTkCanvas, IntVar, DoubleVar, CTkSlider, CTkLabel, CTkButton
 from random import randint
 
-from CShape3D import RenderingProperties, Cube, Sphere, Piramid, Cilinder, Vector3, Shape3D, Renderer
+from cshape3d.CShape3D import (
+    RenderingProperties, Cube, Sphere, Piramid, Cilinder,
+    Vector3, Shape3D, Renderer
+)
 
-    
+
 class Canvas3DRenderer(CTkFrame):
 
     HORIZONTAL = "horizontal"
@@ -51,7 +54,7 @@ class Canvas3DRenderer(CTkFrame):
     FOCAL_POINT_COLOR = "red"
     FOCAL_POINT_SIZE_OFFSETS = (-3, 3)  # Used for drawing the oval representing the focal point
 
-        
+
     def __init__(self, 
                  *args, 
                  width: int, 
