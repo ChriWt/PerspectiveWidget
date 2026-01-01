@@ -1,9 +1,12 @@
 from customtkinter import CTkFrame, CTkCanvas, IntVar, DoubleVar, CTkSlider, CTkLabel, CTkButton
 from random import randint
 
-from CShape3D import RenderingProperties, Cube, Sphere, Piramid, Cilinder, Vector3, Object3D, Renderer, OBJParser, CustomObject3D
+from cshape3d.CShape3D import (
+    RenderingProperties, Cube, Sphere, Piramid, Cilinder,
+    Vector3, Object3D, Renderer, OBJParser, CustomObject3D
+)
 
-    
+
 class Canvas3DRenderer(CTkFrame):
 
     HORIZONTAL = "horizontal"

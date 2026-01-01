@@ -1,15 +1,15 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
-#include "src/shape/Sphere.h"
-#include "src/shape/Cube.h"
-#include "src/shape/Piramid.h"
-#include "src/shape/Cilinder.h"
-
-#include "src/renderer/Renderer.h"
-#include "src/renderer/RenderingProperties.h"
-
-#include "src/object/OBJParser.h"
+#include "shape/Sphere.h"
+#include "shape/Cube.h"
+#include "shape/Piramid.h"
+#include "shape/Cilinder.h"
+#include "renderer/Renderer.h"
+#include "renderer/RenderingProperties.h"
+#include "vector/Vector3.h"
+#include "vector/Vector4.h"
+#include "object/OBJParser.h"
 
 
 namespace py = pybind11;
